@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.post.repository.PostRepository">
+    <select id="getTotalCount" parameterType="long" resultType="int">
+        SELECT COUNT(post_no)
+          FROM tb_post
+         WHERE 1=1
+           AND board_no = #{boardNo}
+    </select>
+
+    <select id="getPostList" resultType="Post">
+        SELECT post.board_no
+             , board.name
+             , post.member_no
+             , member.user_id
+             , post.title
+             , post.view_cnt
+             , post.reply_cnt
+             , post.reg_dt
+             , post.upd_dt
+          FROM tb_post post
+                JOIN tb_member member
+                  ON post.member_no = member.member_no
+                JOIN tb_board board
+                  ON post.board_no = board.board_no
+         WHERE 1=1
+           AND post.board_no = #{boardNo}
+         LIMIT #{pageRequest.startPage}, #{pageRequest.pageSize}
+    </select>
+
+    <select id="getPost" parameterType="long" resultType="Post">
+        SELECT post.post_no
+             , post.board_no
+             , board.name
+             , post.member_no
+             , member.user_id
+             , post.title
+             , post.content
+             , post.view_cnt
+             , post.reply_cnt
+             , post.reg_dt
+             , post.upd_dt
+          FROM tb_post post
+                JOIN tb_member member
+                  ON post.member_no = member.member_no
+                JOIN tb_board board
+                  ON post.board_no = board.board_no
+        WHERE 1=1
+          AND post.post_no = #{postNo}
+    </select>
+
+    <delete id="deletePost" parameterType="long">
+        DELETE FROM tb_post
+         WHERE 1=1
+           AND post_no = #{postNo}
+    </delete>
+
+    <insert id="insertPost" parameterType="Post">
+        INSERT INTO tb_post (
+                               board_no
+                             , member_no
+                             , title
+                             , content
+                             )
+                      VALUES (  #{boardNo}
+                              , #{memberNo}
+                              , #{title}
+                              , #{content}
+                             )
+        <selectKey keyProperty="postNo"
+                   resultType="long" order="AFTER">
+            SELECT LAST_INSERT_ID()
+        </selectKey>
+    </insert>
+
+    <update id="updatePost" parameterType="Post">
+        UPDATE tb_post
+           SET title = #{title}
+             , content = #{content}
+             , view_cnt = #{viewCnt}
+             , reply_cnt = #{replyCnt}
+             , upd_dt = now()
+         WHERE 1=1
+           AND post_no = #{postNo}
+        <selectKey keyProperty="postNo"
+                   resultType="long" order="AFTER">
+            SELECT #{postNo}
+        </selectKey>
+    </update>
+
+    <select id="isExist" resultType="boolean">
+        SELECT EXISTS(SELECT post_no
+                      FROM tb_post
+                      WHERE 1=1
+                        AND post_no=#{postNo})
+    </select>
+</mapper>

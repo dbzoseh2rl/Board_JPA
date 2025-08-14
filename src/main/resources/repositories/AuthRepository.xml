@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.auth.repository.AuthRepository">
+    <select id="isDuplicated" parameterType="String" resultType="boolean">
+        SELECT EXISTS(SELECT user_id
+                        FROM tb_member
+                       WHERE 1=1
+                         AND user_id=#{userId})
+    </select>
+
+    <insert id="signin" parameterType="Member">
+        INSERT INTO tb_member (
+                                user_id
+                              , password
+                              )
+                       VALUES (
+                                 #{userId}
+                               , #{password}
+                               )
+        <selectKey keyProperty="memberNo,userId,password,regDt,updDt"
+                   resultType="Member" order="AFTER">
+            SELECT *
+              FROM tb_member
+             WHERE 1=1
+               AND user_id = #{userId}
+        </selectKey>
+    </insert>
+
+    <select id="findUserById" parameterType="String" resultType="Member">
+        SELECT member_no
+               , user_id
+               , password
+          FROM tb_member
+         WHERE 1=1
+           AND user_id = #{userId}
+    </select>
+
+    <select id="findUserByUserSeq" parameterType="long" resultType="Member">
+        SELECT member_no
+             , user_id
+             , password
+        FROM tb_member
+        WHERE 1=1
+          AND member_no = #{memberNo}
+    </select>
+</mapper>
