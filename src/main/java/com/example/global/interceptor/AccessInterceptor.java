@@ -2,10 +2,9 @@ package com.example.global.interceptor;
 
 import com.example.global.common.exception.AccessTokenRequiredException;
 import com.example.global.common.util.JwtUtil;
-import org.springframework.stereotype.Component;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 

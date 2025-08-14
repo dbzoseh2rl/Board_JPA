@@ -1,8 +1,8 @@
 package com.example.global.advice;
 
-import com.example.dto.ExceptionResult;
-import com.example.dto.ResultType;
-import com.example.global.common.exception.*;
+import com.example.domain.dto.ExceptionResult;
+import com.example.domain.dto.ResultType;
+import com.example.global.common.exception.BaseException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

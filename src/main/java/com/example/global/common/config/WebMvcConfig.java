@@ -18,7 +18,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(accessInterceptor)
                 .excludePathPatterns(
-                        "/v1/auth/signin", "/v1/auth/login", "/v1/auth/refresh",
+                        "/auths/signin", "/auths/login", "/auths/refresh",
                         "/swagger-ui/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
@@ -27,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/error"
                 );
         registry.addInterceptor(refreshInterceptor)
-                .addPathPatterns("/v1/auth/refresh");
+                .addPathPatterns("/auth/refresh");
     }
 
 //    private final JwtUtil jwtUtil;
