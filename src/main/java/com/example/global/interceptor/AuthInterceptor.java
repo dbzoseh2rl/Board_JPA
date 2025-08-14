@@ -2,13 +2,12 @@ package com.example.global.interceptor;
 
 import com.example.global.common.exception.ExpiredTokenException;
 import com.example.global.common.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import org.springframework.web.servlet.HandlerInterceptor;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 
 @RequiredArgsConstructor

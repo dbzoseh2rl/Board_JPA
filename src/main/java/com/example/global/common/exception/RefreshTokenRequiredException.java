@@ -1,6 +1,6 @@
 package com.example.global.common.exception;
 
-import com.example.dto.ResultType;
+import com.example.domain.dto.ResultType;
 
 public class RefreshTokenRequiredException extends BaseException {
 
