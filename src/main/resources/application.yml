@@ -5,15 +5,17 @@ spring:
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
 
-  jpa:
-    hibernate:
-      ddl-auto: none
-      dialect: org.hibernate.dialect.MySQL8Dialect
-    # database-platform: org.hibernate.dialect.MySQL8Dialect
-    # show-sql: true
-    # properties:
-    #   hibernate.format_sql: true
-    open-in-view: true
+  spring:
+    jpa:
+      hibernate:
+        ddl-auto: none                # 스키마 자동 생성/수정 비활성화
+        dialect: org.hibernate.dialect.MySQL8Dialect  # MySQL 8용 Hibernate 방언
+      database-platform: org.hibernate.dialect.MySQL8Dialect  # 선택적, dialect와 동일
+      show-sql: true                 # SQL 쿼리 출력
+      properties:
+        hibernate:
+          format_sql: true           # SQL 포맷팅
+      open-in-view: true             # Lazy Loading 지원
 
 jwt:
   secret: "THISISJWTSECRETKEYTHISISJWTSECRETKEY"
