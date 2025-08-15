@@ -1,6 +1,6 @@
 package com.example.domain.entity;
 
-import com.example.domain.dto.CommentBody;
+import com.example.domain.dto.content.request.CommentRequest;
 import com.example.global.common.model.Timestamp;
 import jakarta.persistence.*;
 import lombok.*;
@@ -39,12 +39,33 @@ public class Comment extends Timestamp {
         this.content = content;
     }
 
-    public static Comment from(Member member, Post post, CommentBody body) {
+    public static Comment from(Member member, Post post, CommentRequest body) {
         return Comment.builder()
-                .member(null)
-                .post(null)
-                .content(body.getContent())
+                .member(member)
+                .post(post)
+                .userId(member.getUserId())
+                .content(body.content())
                 .build();
     }
 
+    // 비즈니스 로직 메서드들
+    public void updateContent(String newContent) {
+        this.content = newContent;
+    }
+
+    public boolean isWrittenBy(String userId) {
+        return this.userId.equals(userId);
+    }
+
+    public void incrementReplyCount() {
+        if (this.post != null) {
+            this.post.setReplyCnt(this.post.getReplyCnt() + 1);
+        }
+    }
+
+    public void decrementReplyCount() {
+        if (this.post != null) {
+            this.post.setReplyCnt(Math.max(0, this.post.getReplyCnt() - 1));
+        }
+    }
 }

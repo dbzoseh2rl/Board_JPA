@@ -1,14 +1,15 @@
 package com.example.domain.controller;
 
-import com.example.domain.dto.*;
+import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.request.PageRequest;
+import com.example.domain.dto.common.response.ApiResponse;
+import com.example.domain.dto.content.request.CommentRequest;
 import com.example.domain.entity.Comment;
 import com.example.domain.entity.Member;
-import com.example.domain.entity.Post;
 import com.example.domain.service.AuthService;
 import com.example.domain.service.BoardService;
 import com.example.domain.service.CommentService;
 import com.example.domain.service.PostService;
-import com.example.global.common.exception.DataNotFoundException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -24,44 +25,33 @@ public class CommentController {
     private final CommentService commentService;
 
     @GetMapping(value = "")
-    public PageList<Comment> getCommentList(@PathVariable long boardSeq, @PathVariable long postSeq, PageRequest pageRequest) {
+    public PageResponse<Comment> getCommentList(@PathVariable long boardSeq, @PathVariable long postSeq, PageRequest pageRequest) {
         checkExistence(boardSeq, postSeq);
         return commentService.getCommentList(pageRequest, postSeq);
     }
 
-    @DeleteMapping(value = "/{commentSeq}")
-    public Result deleteComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @PathVariable long commentSeq) {
-        checkExistence(boardSeq, postSeq);
-        Comment comment = getValidatedComment(userSeq, postSeq, commentSeq);
-        return commentService.deleteComment(comment);
-    }
-
     @PostMapping(value = "")
-    public Comment createComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @RequestBody @Valid CommentBody body) {
-        Member member = authService.get(userSeq);
-        Post post = postService.get(postSeq);
-
+    public Comment createComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @RequestBody @Valid CommentRequest body) {
         checkExistence(boardSeq, postSeq);
-        postService.updateReplyCount(postSeq);
-        return commentService.createComment(Comment.from(member, post, body));
+        
+        // Service의 새로운 메서드 사용
+        return commentService.createComment(userSeq, postSeq, body);
     }
 
     @PutMapping(value = "/{commentSeq}")
-    public Comment modifyComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @PathVariable long commentSeq, @RequestBody @Valid CommentBody body) {
-        PathVariableSequenceDto pathVariableSequenceDto = PathVariableSequenceDto.builder()
-                .userSeq(userSeq)
-                .boardSeq(boardSeq)
-                .postSeq(postSeq)
-                .commentSeq(commentSeq)
-                .build();
+    public Comment updateComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @PathVariable long commentSeq, @RequestBody @Valid CommentRequest body) {
+        checkExistence(boardSeq, postSeq);
+        
+        // Service의 새로운 메서드 사용
+        return commentService.updateComment(commentSeq, getUserId(userSeq), body);
+    }
 
-        checkExistence(pathVariableSequenceDto);
-
-        Comment comment = getValidatedComment(pathVariableSequenceDto);
-
-        comment.setContent(body.getContent());
-
-        return commentService.modifyComment(comment);
+    @DeleteMapping(value = "/{commentSeq}")
+    public ApiResponse deleteComment(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @PathVariable long commentSeq) {
+        checkExistence(boardSeq, postSeq);
+        
+        // Service의 새로운 메서드 사용
+        return commentService.deleteComment(commentSeq, getUserId(userSeq));
     }
 
     private void checkExistence(long boardSeq, long postSeq) {
@@ -69,51 +59,8 @@ public class CommentController {
         postService.validatePostSeq(postSeq);
     }
 
-    private void checkExistence(PathVariableSequenceDto pathVariableSequenceDto) {
-        boardService.validateBoardSeq(pathVariableSequenceDto.getBoardSeq());
-        postService.validatePostSeq(pathVariableSequenceDto.getPostSeq());
+    private String getUserId(long userSeq) {
+        Member member = authService.get(userSeq);
+        return member.getUserId();
     }
-
-    private Comment getValidatedComment(long userSeq, long postSeq, long commentSeq) {
-        Comment comment = commentService.getComment(commentSeq);
-
-        if (comment == null) {
-            throw new DataNotFoundException();
-        }
-
-        checkEquality(comment, userSeq, postSeq);
-        return comment;
-    }
-
-    private Comment getValidatedComment(PathVariableSequenceDto pathVariableSequenceDto) {
-        Comment comment = commentService.getComment(pathVariableSequenceDto.getCommentSeq());
-
-        if (comment == null) {
-            throw new DataNotFoundException();
-        }
-
-        checkEquality(comment, pathVariableSequenceDto);
-        return comment;
-    }
-
-    private void checkEquality(Comment comment, long userSeq, long postSeq) {
-//            if (comment.getMember() != userSeq) {
-//                throw new InvalidParameterException();
-//            }
-//
-//            if (comment.getPostNo() != postSeq) {
-//                throw new InvalidParameterException();
-//            }
-    }
-
-    private void checkEquality(Comment comment, PathVariableSequenceDto pathVariableSequenceDto) {
-//            if (comment.getMember() != pathVariableSequenceDto.getUserSeq()) {
-//                throw new InvalidParameterException();
-//            }
-//
-//            if (comment.getPostNo() != pathVariableSequenceDto.getPostSeq()) {
-//                throw new InvalidParameterException();
-//            }
-    }
-
 }

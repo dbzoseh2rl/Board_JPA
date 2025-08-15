@@ -1,6 +1,6 @@
 package com.example.global.common.exception;
 
-import com.example.domain.dto.ResultType;
+import com.example.domain.dto.common.ResultType;
 
 public class ExpiredTokenException extends BaseException {
 

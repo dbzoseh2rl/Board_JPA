@@ -1,7 +1,7 @@
 package com.example.global.filter;
 
-import com.example.domain.dto.Result;
-import com.example.domain.dto.ResultType;
+import com.example.domain.dto.common.response.ApiResponse;
+import com.example.domain.dto.common.ResultType;
 import com.example.global.common.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -58,10 +58,12 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private void setHttpServletResponse(HttpServletResponse response, ResultType resultType) throws IOException {
-        Result result = new Result(resultType);
-        response.setStatus(result.getStatus().value());
+        ApiResponse apiResponse = new ApiResponse(resultType);
+        
+        // record의 getter 메서드 사용: getStatus() → status()
+        response.setStatus(apiResponse.status().value());
         response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        String content = new ObjectMapper().writeValueAsString(result);
+        String content = new ObjectMapper().writeValueAsString(apiResponse);
         response.setContentLength(content.length());
         response.getWriter()
                 .write(content);

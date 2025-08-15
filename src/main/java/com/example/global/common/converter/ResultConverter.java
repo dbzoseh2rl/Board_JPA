@@ -1,7 +1,7 @@
 package com.example.global.common.converter;
 
 
-import com.example.domain.dto.Result;
+import com.example.domain.dto.common.response.ApiResponse;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -20,14 +20,16 @@ public class ResultConverter extends MappingJackson2HttpMessageConverter {
 
     @Override
     protected void writeInternal(Object object, Type type, HttpOutputMessage outputMessage) throws IOException, HttpMessageNotWritableException {
-        Result result;
+        ApiResponse apiResponse;
 
-        if (object instanceof Result) {
-            result = (Result) object;
+        if (object instanceof ApiResponse) {
+            apiResponse = (ApiResponse) object;
         } else {
-            result = new Result(object);
+            apiResponse = new ApiResponse(object);
         }
-        response.setStatus(result.getStatus().value());
-        super.writeInternal(result, type, outputMessage);
+        
+        // record의 getter 메서드 사용
+        response.setStatus(apiResponse.status().value());
+        super.writeInternal(apiResponse, type, outputMessage);
     }
 }

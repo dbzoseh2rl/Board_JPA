@@ -1,10 +1,19 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.*;
+import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.request.PageRequest;
+import com.example.domain.dto.common.response.ApiResponse;
+import com.example.domain.dto.common.ResultType;
+import com.example.domain.dto.content.request.PostRequest;
+import com.example.domain.entity.Board;
+import com.example.domain.entity.Member;
 import com.example.domain.entity.Post;
+import com.example.domain.repository.AuthRepository;
+import com.example.domain.repository.BoardRepository;
 import com.example.domain.repository.PostRepository;
 import com.example.global.common.exception.DataNotFoundException;
 import com.example.global.common.exception.InvalidParameterException;
+import com.example.global.common.exception.NoAuthorityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,11 +27,13 @@ import java.util.List;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final AuthRepository memberRepository;
+    private final BoardRepository boardRepository;
 
-    public PageList<Post> getPostList(PageRequest pageRequest, long boardSeq) {
+    public PageResponse<Post> getPostList(PageRequest pageRequest, long boardSeq) {
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                pageRequest.getPageIndex() - 1,
-                pageRequest.getPageSize()
+                pageRequest.pageIndex() - 1,  // record getter 사용
+                pageRequest.pageSize()
         );
 
         Page<Post> postPage = postRepository.findByBoardId(boardSeq, pageable);
@@ -30,7 +41,7 @@ public class PostService {
         int totalCount = (int) postPage.getTotalElements();
         List<Post> postList = postPage.getContent();
 
-        return new PageList<>(pageRequest.getPageSize(), totalCount, postList);
+        return PageResponse.of(pageRequest.pageSize(), totalCount, postList);
     }
 
     public Post get(long postSeq) {
@@ -38,37 +49,54 @@ public class PostService {
     }
 
     @Transactional
+    public Post createPost(Long memberId, Long boardId, PostRequest request) {
+        // 데이터 조회
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new DataNotFoundException());
+        
+        Board board = boardRepository.findById(boardId)
+                .orElseThrow(() -> new DataNotFoundException());
+        
+        // Entity의 정적 팩토리 메서드 사용
+        Post post = Post.from(member, board, request);
+        
+        return postRepository.save(post);
+    }
+
+    @Transactional
     public Post getPostAndIncreaseViewCount(long userSeq, long boardSeq, long postSeq) {
         Post post = getValidatedPost(userSeq, boardSeq, postSeq);
-        post.setViewCnt(post.getViewCnt() + 1);
+        
+        // Entity의 비즈니스 로직 사용
+        post.incrementViewCount();
+        
         return postRepository.save(post);
     }
 
     @Transactional
-    public Post updateReplyCount(long postSeq) {
-        Post post = get(postSeq);
-        post.setReplyCnt(post.getReplyCnt() + 1);
+    public Post updatePost(Long postId, String userId, PostRequest request) {
+        Post post = get(postId);
+        
+        // Entity의 비즈니스 로직 사용
+        if (!post.isWrittenBy(userId)) {
+            throw new NoAuthorityException();
+        }
+        
+        post.updateContent(request.title(), request.content());
         return postRepository.save(post);
     }
 
     @Transactional
-    public Result deletePost(Post post) {
-        postRepository.deleteById(post.getId());
-        return new Result(ResultType.OK);
-    }
-
-    @Transactional
-    public Post createPost(Post post) {
-        return postRepository.save(post);
-    }
-
-
-    @Transactional
-    public Post modifyPost(long userSeq, long boardSeq, long postSeq, PostBody body) {
-        Post post = getValidatedPost(userSeq, boardSeq, postSeq);
-        post.setTitle(body.getTitle());
-        post.setContent(body.getContent());
-        return postRepository.save(post);
+    public ApiResponse deletePost(Long postId, String userId) {
+        Post post = get(postId);
+        
+        // Entity의 비즈니스 로직 사용
+        if (!post.isWrittenBy(userId)) {
+            throw new NoAuthorityException();
+        }
+        
+        postRepository.deleteById(postId);
+        return new ApiResponse(ResultType.OK);
     }
 
     public void validatePostSeq(long postSeq) {
@@ -97,5 +125,4 @@ public class PostService {
             throw new InvalidParameterException();
         }
     }
-
 }

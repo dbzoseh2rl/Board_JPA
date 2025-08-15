@@ -1,7 +1,7 @@
 package com.example.domain.controller;
 
-import com.example.domain.dto.User;
-import com.example.domain.dto.UserWithToken;
+import com.example.domain.dto.user.UserResponse;
+import com.example.domain.dto.user.UserWithTokenResponse;
 import com.example.domain.entity.Member;
 import com.example.domain.service.AuthService;
 import jakarta.validation.Valid;
@@ -16,13 +16,13 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping(value="/signin")
-    public Member signin(@Valid @RequestBody User user) {
-        return authService.signin(Member.from(user));
+    public Member signin(@Valid @RequestBody UserResponse userResponse) {
+        return authService.signin(Member.from(userResponse));
     }
 
     @PostMapping(value="/login")
-    public UserWithToken login(@Valid @RequestBody User user) {
-        return authService.login(user);
+    public UserWithTokenResponse login(@Valid @RequestBody UserResponse userResponse) {
+        return authService.login(userResponse);
     }
 
     @PostMapping(value="/logout")
@@ -31,7 +31,7 @@ public class AuthController {
     }
 
     @GetMapping(value="/refresh")
-    public UserWithToken refreshToken(@RequestAttribute long userSeq) {
+    public UserWithTokenResponse refreshToken(@RequestAttribute long userSeq) {
         return authService.refreshToken(userSeq);
     }
 }

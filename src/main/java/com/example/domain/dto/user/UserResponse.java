@@ -2,11 +2,7 @@ package com.example.domain.dto.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.Getter;
-import lombok.ToString;
 
-@Getter
-@ToString
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserResponse(
         @NotEmpty String id,

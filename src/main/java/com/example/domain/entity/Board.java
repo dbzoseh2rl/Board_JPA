@@ -23,4 +23,19 @@ public class Board extends Timestamp {
         this.name = name;
     }
 
+    // 정적 팩토리 메서드
+    public static Board from(String name) {
+        return Board.builder()
+                .name(name)
+                .build();
+    }
+
+    // 비즈니스 로직 메서드들
+    public void updateName(String newName) {
+        this.name = newName;
+    }
+
+    public boolean hasName(String name) {
+        return this.name.equals(name);
+    }
 }

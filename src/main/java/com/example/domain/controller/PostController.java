@@ -1,9 +1,9 @@
 package com.example.domain.controller;
 
-import com.example.domain.dto.PageList;
-import com.example.domain.dto.PageRequest;
-import com.example.domain.dto.PostBody;
-import com.example.domain.dto.Result;
+import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.request.PageRequest;
+import com.example.domain.dto.content.request.PostRequest;
+import com.example.domain.dto.common.response.ApiResponse;
 import com.example.domain.entity.Board;
 import com.example.domain.entity.Member;
 import com.example.domain.entity.Post;
@@ -27,7 +27,7 @@ public class PostController {
     private final CommentService commentService;
 
     @GetMapping(value = "")
-    public PageList<Post> getPostList(@PathVariable long boardSeq, PageRequest pageRequest) {
+    public PageResponse<Post> getPostList(@PathVariable long boardSeq, PageRequest pageRequest) {
         return postService.getPostList(pageRequest, boardSeq);
     }
 
@@ -37,24 +37,25 @@ public class PostController {
     }
 
     @DeleteMapping(value = "/{postSeq}")
-    public Result deletePost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq) {
-        Post post = postService.getValidatedPost(userSeq, boardSeq, postSeq);
-        if (commentService.isCommentExist(postSeq)) {
-            throw new NotAllowedOperationException();
-        }
-        return postService.deletePost(post);
+    public ApiResponse deletePost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq) {
+        // Service의 새로운 메서드 사용
+        return postService.deletePost(postSeq, getUserId(userSeq));
     }
 
     @PostMapping(value = "")
-    public Post createPost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @RequestBody @Valid PostBody postBody) {
-        Member member = authService.get(userSeq);
-        Board board = boardService.get(boardSeq);
-        return postService.createPost(Post.from(member, board, postBody));
+    public Post createPost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @RequestBody @Valid PostRequest postRequest) {
+        // Service의 새로운 메서드 사용
+        return postService.createPost(userSeq, boardSeq, postRequest);
     }
 
     @PutMapping(value = "/{postSeq}")
-    public Post modifyPost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @RequestBody @Valid PostBody body) {
-        return postService.modifyPost(userSeq, boardSeq, postSeq, body);
+    public Post modifyPost(@RequestAttribute long userSeq, @PathVariable long boardSeq, @PathVariable long postSeq, @RequestBody @Valid PostRequest body) {
+        // Service의 새로운 메서드 사용
+        return postService.updatePost(postSeq, getUserId(userSeq), body);
     }
 
+    private String getUserId(long userSeq) {
+        Member member = authService.get(userSeq);
+        return member.getUserId();
+    }
 }

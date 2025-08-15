@@ -1,6 +1,6 @@
 package com.example.domain.entity;
 
-import com.example.domain.dto.User;
+import com.example.domain.dto.user.UserResponse;
 import com.example.global.common.model.Timestamp;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,12 +32,31 @@ public class Member extends Timestamp {
         this.role = role;
     }
 
-    public static Member from(User user) {
+    public static Member from(UserResponse userResponse) {
         return Member.builder()
-                .userId(user.getId())
-                .password(user.getPassword())
+                .userId(userResponse.id())        // record의 getter 메서드 사용
+                .password(userResponse.password()) // record의 getter 메서드 사용
                 .build();
     }
 
+    // 추가 비즈니스 로직 메서드들
+    public void updatePassword(String newPassword) {
+        this.password = newPassword;
+    }
 
+    public void updateRole(String newRole) {
+        this.role = newRole;
+    }
+
+    public boolean hasRole(String role) {
+        return this.role != null && this.role.equals(role);
+    }
+
+    public boolean isAdmin() {
+        return hasRole("ADMIN");
+    }
+
+    public boolean isUser() {
+        return hasRole("USER");
+    }
 }

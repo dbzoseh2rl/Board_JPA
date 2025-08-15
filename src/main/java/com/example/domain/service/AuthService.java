@@ -1,7 +1,7 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.User;
-import com.example.domain.dto.UserWithToken;
+import com.example.domain.dto.user.UserResponse;
+import com.example.domain.dto.user.UserWithTokenResponse;
 import com.example.domain.entity.Member;
 import com.example.domain.repository.AuthRepository;
 import com.example.global.common.exception.UserNotFoundException;
@@ -27,27 +27,27 @@ public class AuthService {
         return authRepository.save(member);
     }
 
-    public UserWithToken login(User user) {
-        Member member = authRepository.findByUserId(user.getId())
+    public UserWithTokenResponse login(UserResponse userResponse) {
+        Member member = authRepository.findByUserId(userResponse.id())
                 .orElseThrow(UserNotFoundException::new);
 
         // 비밀번호 검증
-        if (!user.getPassword().equals(member.getPassword())) {
+        if (!userResponse.password().equals(member.getPassword())) {
             throw new UserNotFoundException();
         }
 
         return generateToken(member);
     }
 
-    public UserWithToken refreshToken(long userSeq) {
+    public UserWithTokenResponse refreshToken(long userSeq) {
         Member member = authRepository.findById(userSeq)
                 .orElseThrow(UserNotFoundException::new);
 
         return generateToken(member);
     }
 
-    private UserWithToken generateToken(Member member) {
-        return new UserWithToken(
+    private UserWithTokenResponse generateToken(Member member) {
+        return new UserWithTokenResponse(
                 member.getUserId(),
                 jwtUtil.generate(member.getId(), "ACCESS"),
                 jwtUtil.generate(member.getId(), "REFRESH")

@@ -1,7 +1,7 @@
 package com.example.domain.controller;
 
-import com.example.domain.dto.PageList;
-import com.example.domain.dto.PageRequest;
+import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.request.PageRequest;
 import com.example.domain.entity.Board;
 import com.example.domain.service.BoardService;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping(value="")
-    public PageList<Board> getBoardList(PageRequest pageRequest) {
+    public PageResponse<Board> getBoardList(PageRequest pageRequest) {
         return boardService.getBoardList(pageRequest);
     }
 
