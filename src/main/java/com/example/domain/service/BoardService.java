@@ -58,14 +58,7 @@ public class BoardService{
     }
 
     public boolean isBoardExists(String name) {
-        // 방법 1: findAll()을 사용하여 이름으로 검색
         return boardRepository.findAll().stream()
                 .anyMatch(board -> board.hasName(name));
-        
-        // 방법 2: Repository에 findByName 메서드가 있다면
-        // return boardRepository.findByName(name).isPresent();
-        
-        // 방법 3: Repository에 existsByName 메서드가 있다면
-        // return boardRepository.existsByName(name);
     }
 }
