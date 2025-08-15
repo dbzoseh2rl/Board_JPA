@@ -1,7 +1,7 @@
 package com.example.global.advice;
 
-import com.example.domain.dto.common.response.ErrorResponse;
 import com.example.domain.dto.common.ResultType;
+import com.example.domain.dto.common.response.ErrorResponse;
 import com.example.global.common.exception.BaseException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
@@ -20,6 +20,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 @RestControllerAdvice
 public class ExceptionControllerAdvice {
+
     final Logger log = LoggerFactory.getLogger(this.getClass());
 
     // method 잘못된 경우
@@ -105,4 +106,5 @@ public class ExceptionControllerAdvice {
     private ErrorResponse processException(ResultType resultType) {
         return new ErrorResponse(resultType);
     }
+
 }

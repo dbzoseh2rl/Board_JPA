@@ -12,15 +12,15 @@
         SELECT post.board_no
              , board.name
              , post.member_no
-             , member.user_id
+             , user.user_id
              , post.title
              , post.view_cnt
              , post.reply_cnt
              , post.reg_dt
              , post.upd_dt
           FROM tb_post post
-                JOIN tb_member member
-                  ON post.member_no = member.member_no
+                JOIN tb_member user
+                  ON post.member_no = user.member_no
                 JOIN tb_board board
                   ON post.board_no = board.board_no
          WHERE 1=1
@@ -33,7 +33,7 @@
              , post.board_no
              , board.name
              , post.member_no
-             , member.user_id
+             , user.user_id
              , post.title
              , post.content
              , post.view_cnt
@@ -41,8 +41,8 @@
              , post.reg_dt
              , post.upd_dt
           FROM tb_post post
-                JOIN tb_member member
-                  ON post.member_no = member.member_no
+                JOIN tb_member user
+                  ON post.member_no = user.member_no
                 JOIN tb_board board
                   ON post.board_no = board.board_no
         WHERE 1=1

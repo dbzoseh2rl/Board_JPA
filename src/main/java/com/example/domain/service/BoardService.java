@@ -1,7 +1,7 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.dto.common.request.PageRequest;
+import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.entity.Board;
 import com.example.domain.repository.BoardRepository;
 import com.example.global.common.exception.DataNotFoundException;
@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class BoardService{
+public class BoardService {
 
     private final BoardRepository boardRepository;
 
@@ -45,9 +45,7 @@ public class BoardService{
 
     @Transactional
     public Board createBoard(String name) {
-        // Entity의 정적 팩토리 메서드 사용
-        Board board = Board.from(name);
-        return boardRepository.save(board);
+        return boardRepository.save(Board.from(name));
     }
 
     @Transactional
@@ -58,7 +56,7 @@ public class BoardService{
     }
 
     public boolean isBoardExists(String name) {
-        return boardRepository.findAll().stream()
-                .anyMatch(board -> board.hasName(name));
+        return boardRepository.findAll().stream().anyMatch(board -> board.hasName(name));
     }
+
 }

@@ -5,6 +5,8 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class JwtUtil {
+
     @Value("${jwt.secret}")
     private String secret;
 
@@ -79,10 +83,8 @@ public class JwtUtil {
         return getClaimsFromToken(token).get("type", String.class);
     }
 
-
     public Long getUserSeqFromToken(String token) {
         return getClaimsFromToken(token).get("userSeq", Long.class);
     }
 
-    private JwtUtil() { }
 }

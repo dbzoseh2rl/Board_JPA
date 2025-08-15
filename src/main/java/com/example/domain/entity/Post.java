@@ -20,13 +20,11 @@ public class Post extends Timestamp {
 
     @ManyToOne
     @JoinColumn
-    private Member member;
+    private User user;
 
     @ManyToOne
     @JoinColumn
     private Board board;
-
-    private String userId;
 
     private String name;
 
@@ -38,14 +36,13 @@ public class Post extends Timestamp {
 
     private int replyCnt;
 
-    public static Post from(Member member, Board board, PostRequest postRequest) {
+    public static Post from(User user, Board board, PostRequest postRequest) {
         return Post.builder()
-                .member(member)
+                .user(user)
                 .board(board)
-                .userId(member.getUserId()) // Member의 userId 필드 사용
-                .name(board.getName()) // Board의 name 필드 사용
-                .title(postRequest.title()) // record의 getter 메서드 사용
-                .content(postRequest.content()) // record의 getter 메서드 사용
+                .name(board.getName())
+                .title(postRequest.title())
+                .content(postRequest.content())
                 .viewCnt(0)
                 .replyCnt(0)
                 .build();
@@ -70,7 +67,7 @@ public class Post extends Timestamp {
     }
 
     public boolean isWrittenBy(String userId) {
-        return this.userId.equals(userId);
+        return this.user.getEmail().equals(userId);
     }
 
     public boolean hasReplies() {
@@ -80,4 +77,5 @@ public class Post extends Timestamp {
     public boolean isPopular() {
         return this.viewCnt > 100; // 조회수 100 이상을 인기 글로 간주
     }
+
 }

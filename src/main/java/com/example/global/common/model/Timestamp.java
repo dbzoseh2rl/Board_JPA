@@ -7,7 +7,12 @@ import java.util.Date;
 
 @Getter
 @NoArgsConstructor
+@Deprecated
 public class Timestamp {
+
+    // TODO: Audit 적용하기
+
     private Date regDt;
     private Date updDt;
+
 }

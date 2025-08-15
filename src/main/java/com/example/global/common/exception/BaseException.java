@@ -1,7 +1,7 @@
 package com.example.global.common.exception;
 
-import com.example.domain.dto.common.response.ErrorResponse;
 import com.example.domain.dto.common.ResultType;
+import com.example.domain.dto.common.response.ErrorResponse;
 
 public class BaseException extends RuntimeException {
 

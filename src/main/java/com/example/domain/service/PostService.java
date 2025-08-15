@@ -1,15 +1,13 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.request.PageRequest;
 import com.example.domain.dto.common.response.ApiResponse;
-import com.example.domain.dto.common.ResultType;
+import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.dto.content.request.PostRequest;
 import com.example.domain.entity.Board;
-import com.example.domain.entity.Member;
 import com.example.domain.entity.Post;
-import com.example.domain.repository.AuthRepository;
-import com.example.domain.repository.BoardRepository;
+import com.example.domain.entity.User;
 import com.example.domain.repository.PostRepository;
 import com.example.global.common.exception.DataNotFoundException;
 import com.example.global.common.exception.InvalidParameterException;
@@ -26,9 +24,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
 
+    private final UserService userService;
+    private final BoardService boardService;
+
     private final PostRepository postRepository;
-    private final AuthRepository memberRepository;
-    private final BoardRepository boardRepository;
 
     public PageResponse<Post> getPostList(PageRequest pageRequest, long boardSeq) {
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
@@ -51,55 +50,49 @@ public class PostService {
     @Transactional
     public Post createPost(Long memberId, Long boardId, PostRequest request) {
         // 데이터 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new DataNotFoundException());
-        
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new DataNotFoundException());
-        
-        // Entity의 정적 팩토리 메서드 사용
-        Post post = Post.from(member, board, request);
-        
-        return postRepository.save(post);
+        User user = userService.get(memberId);
+        Board board = boardService.get(boardId);
+
+        return postRepository.save(Post.from(user, board, request));
     }
 
     @Transactional
     public Post getPostAndIncreaseViewCount(long userSeq, long boardSeq, long postSeq) {
         Post post = getValidatedPost(userSeq, boardSeq, postSeq);
-        
+
         // Entity의 비즈니스 로직 사용
         post.incrementViewCount();
-        
+
         return postRepository.save(post);
     }
 
     @Transactional
-    public Post updatePost(Long postId, String userId, PostRequest request) {
+    public Post updatePost(Long postId, Long userSeq, PostRequest request) {
         Post post = get(postId);
-        
+        String userId = userService.get(userSeq).getEmail();
         // Entity의 비즈니스 로직 사용
         if (!post.isWrittenBy(userId)) {
             throw new NoAuthorityException();
         }
-        
+
         post.updateContent(request.title(), request.content());
         return postRepository.save(post);
     }
 
     @Transactional
-    public ApiResponse deletePost(Long postId, String userId) {
+    public ApiResponse deletePost(Long postId, Long userSeq) {
         Post post = get(postId);
-        
+        String userId = userService.get(userSeq).getEmail();
         // Entity의 비즈니스 로직 사용
         if (!post.isWrittenBy(userId)) {
             throw new NoAuthorityException();
         }
-        
+
         postRepository.deleteById(postId);
         return new ApiResponse(ResultType.OK);
     }
 
-    public void validatePostSeq(long postSeq) {
+    public void validatePostId(long postSeq) {
         if (!postRepository.existsById(postSeq)) {
             throw new DataNotFoundException();
         }
@@ -121,8 +114,9 @@ public class PostService {
             throw new InvalidParameterException();
         }
 
-        if (post.getMember().getId() != userSeq) {
+        if (post.getUser().getId() != userSeq) {
             throw new InvalidParameterException();
         }
     }
+
 }

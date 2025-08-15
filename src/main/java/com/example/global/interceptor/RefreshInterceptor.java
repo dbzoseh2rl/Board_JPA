@@ -34,4 +34,5 @@ public class RefreshInterceptor extends AuthInterceptor {
             throw new RefreshTokenRequiredException(this.uri);
         }
     }
+
 }

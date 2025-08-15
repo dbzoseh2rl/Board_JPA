@@ -7,9 +7,12 @@ import org.springframework.http.HttpStatus;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record ApiResponse(
+
         ResultType resultType,
         Object data
+
 ) {
+
     public ApiResponse(ResultType resultType) {
         this(resultType, null);
     }

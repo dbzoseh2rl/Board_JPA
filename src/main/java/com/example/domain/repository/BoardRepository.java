@@ -16,4 +16,5 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     
     // 이름으로 게시판 존재 여부 확인
     boolean existsByName(String name);
+
 }

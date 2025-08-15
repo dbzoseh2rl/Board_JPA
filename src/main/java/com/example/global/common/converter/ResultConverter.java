@@ -14,6 +14,7 @@ import java.lang.reflect.Type;
 
 @Configuration
 @RequiredArgsConstructor
+@Deprecated
 public class ResultConverter extends MappingJackson2HttpMessageConverter {
 
     private final HttpServletResponse response;

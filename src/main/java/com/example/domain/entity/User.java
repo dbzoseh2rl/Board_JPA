@@ -8,16 +8,16 @@ import lombok.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "member")
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends Timestamp {
+public class User extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String userId;
+    private String email;
 
     @Column(nullable = false)
     private String password;
@@ -25,16 +25,16 @@ public class Member extends Timestamp {
     private String role;
 
     @Builder
-    private Member(Long id, String userId, String password, String role) {
+    private User(Long id, String email, String password, String role) {
         this.id = id;
-        this.userId = userId;
+        this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public static Member from(UserResponse userResponse) {
-        return Member.builder()
-                .userId(userResponse.id())        // record의 getter 메서드 사용
+    public static User from(UserResponse userResponse) {
+        return User.builder()
+                .email(userResponse.id())        // record의 getter 메서드 사용
                 .password(userResponse.password()) // record의 getter 메서드 사용
                 .build();
     }
@@ -59,4 +59,5 @@ public class Member extends Timestamp {
     public boolean isUser() {
         return hasRole("USER");
     }
+
 }

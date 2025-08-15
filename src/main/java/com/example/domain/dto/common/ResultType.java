@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ResultType {
+
     OK(HttpStatus.OK, "200000", "OK"),
 
     NO_CONTENT(HttpStatus.NO_CONTENT, "204001", "No content"),
@@ -41,4 +42,5 @@ public enum ResultType {
         this.code = code;
         this.message = message;
     }
+
 }

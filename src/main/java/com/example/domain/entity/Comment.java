@@ -22,28 +22,24 @@ public class Comment extends Timestamp {
 
     @ManyToOne
     @JoinColumn
-    private Member member;
-
-    @Column(name = "user_id")
-    private String userId;
+    private User user;
 
     @Setter
     @Column(nullable = false)
     private String content;
 
     @Builder
-    private Comment(Post post, Member member, String userId, String content) {
+    private Comment(Post post, User user, String userId, String content) {
         this.post = post;
-        this.member = member;
-        this.userId = userId;
+        this.user = user;
         this.content = content;
     }
 
-    public static Comment from(Member member, Post post, CommentRequest body) {
+    public static Comment from(User user, Post post, CommentRequest body) {
         return Comment.builder()
-                .member(member)
+                .user(user)
                 .post(post)
-                .userId(member.getUserId())
+                .userId(user.getEmail())
                 .content(body.content())
                 .build();
     }
@@ -53,8 +49,8 @@ public class Comment extends Timestamp {
         this.content = newContent;
     }
 
-    public boolean isWrittenBy(String userId) {
-        return this.userId.equals(userId);
+    public boolean isWrittenBy(String email) {
+        return this.user.getEmail().equals(email);
     }
 
     public void incrementReplyCount() {
@@ -68,4 +64,5 @@ public class Comment extends Timestamp {
             this.post.setReplyCnt(Math.max(0, this.post.getReplyCnt() - 1));
         }
     }
+
 }

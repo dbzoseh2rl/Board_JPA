@@ -5,11 +5,18 @@ import jakarta.validation.constraints.NotEmpty;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserResponse(
-        @NotEmpty String id,
+
+        @NotEmpty
+        String id,
+
         String password,
+
         String accessToken,
+
         String refreshToken
+
 ) {
+
     // 정적 팩토리 메서드들
     public static UserResponse basic(String id, String password) {
         return new UserResponse(id, password, null, null);
@@ -22,4 +29,5 @@ public record UserResponse(
     public boolean hasTokens() {
         return accessToken != null && refreshToken != null;
     }
+
 }

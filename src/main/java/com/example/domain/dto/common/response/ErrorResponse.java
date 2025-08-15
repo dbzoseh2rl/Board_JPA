@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.springframework.http.HttpStatus;
 
 public record ErrorResponse(ResultType resultType) {
+
     @JsonIgnore
     public HttpStatus status() {
         return resultType != null ? resultType.getStatus() : null;
@@ -17,4 +18,5 @@ public record ErrorResponse(ResultType resultType) {
     public String message() {
         return resultType != null ? resultType.getMessage() : null;
     }
+
 }

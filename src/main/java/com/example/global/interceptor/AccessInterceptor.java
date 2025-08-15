@@ -34,4 +34,5 @@ public class AccessInterceptor extends AuthInterceptor {
             throw new AccessTokenRequiredException(this.uri);
         }
     }
+    
 }

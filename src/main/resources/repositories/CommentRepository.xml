@@ -13,13 +13,13 @@
         SELECT comment.comment_no
              , comment.post_no
              , comment.member_no
-             , member.user_id
+             , user.user_id
              , comment.content
              , comment.reg_dt
              , comment.upd_dt
           FROM tb_comment comment
-                JOIN tb_member member
-                  ON comment.member_no = member.member_no
+                JOIN tb_member user
+                  ON comment.member_no = user.member_no
          WHERE 1=1
            AND comment.post_no = #{postNo}
          LIMIT #{pageRequest.startPage}, #{pageRequest.pageSize}
@@ -29,13 +29,13 @@
         SELECT comment.comment_no
              , comment.post_no
              , comment.member_no
-             , member.user_id
+             , user.user_id
              , comment.content
              , comment.reg_dt
              , comment.upd_dt
           FROM tb_comment comment
-                JOIN tb_member member
-                  ON comment.member_no = member.member_no
+                JOIN tb_member user
+                  ON comment.member_no = user.member_no
          WHERE 1=1
            AND comment.comment_no = #{commentNo}
     </select>

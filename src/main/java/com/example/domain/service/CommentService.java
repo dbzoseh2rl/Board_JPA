@@ -1,16 +1,14 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.common.response.PageResponse;
+import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.request.PageRequest;
 import com.example.domain.dto.common.response.ApiResponse;
-import com.example.domain.dto.common.ResultType;
+import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.dto.content.request.CommentRequest;
 import com.example.domain.entity.Comment;
-import com.example.domain.entity.Member;
 import com.example.domain.entity.Post;
-import com.example.domain.repository.AuthRepository;
+import com.example.domain.entity.User;
 import com.example.domain.repository.CommentRepository;
-import com.example.domain.repository.PostRepository;
 import com.example.global.common.exception.DataNotFoundException;
 import com.example.global.common.exception.NoAuthorityException;
 import lombok.RequiredArgsConstructor;
@@ -25,76 +23,93 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CommentService {
 
+    private final UserService userService;
+    private final BoardService boardService;
+    private final PostService postService;
+
     private final CommentRepository commentRepository;
-    private final AuthRepository memberRepository;
-    private final PostRepository postRepository;
-
-    public PageResponse<Comment> getCommentList(PageRequest pageRequest, long postSeq) {
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                pageRequest.pageIndex() - 1,  // record getter 사용
-                pageRequest.pageSize()
-        );
-
-        Page<Comment> commentPage = commentRepository.findByPostId(postSeq, pageable);
-
-        long totalCount = commentPage.getTotalElements();
-        List<Comment> commentList = commentPage.getContent();
-
-        return PageResponse.of(pageRequest.pageSize(), (int) totalCount, commentList);
-    }
-
-    public Comment getComment(long commentSeq) {
-        return commentRepository.findById(commentSeq)
-                .orElseThrow(() -> new DataNotFoundException());
-    }
 
     @Transactional
-    public Comment createComment(Long memberId, Long postId, CommentRequest request) {
+    public Comment create(Long userId, Long boardId, Long postId, CommentRequest commentRequest) {
+        checkExistence(boardId, postId);
+
         // 데이터 조회
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new DataNotFoundException());
-        
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new DataNotFoundException());
-        
+        User user = userService.get(userId);
+        Post post = postService.get(postId);
+
         // Entity의 정적 팩토리 메서드 사용
-        Comment comment = Comment.from(member, post, request);
-        
+        Comment comment = Comment.from(user, post, commentRequest);
+
         // Entity의 비즈니스 로직 호출
         comment.incrementReplyCount();
-        
+
         return commentRepository.save(comment);
     }
 
+    public Comment get(long id) {
+        return commentRepository.findById(id).orElseThrow(DataNotFoundException::new);
+    }
+
+    public PageResponse<Comment> getComments(long postId, PageRequest pageRequest) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                pageRequest.pageIndex() - 1,
+                pageRequest.pageSize()
+        );
+
+        Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
+
+        long totalCount = commentPage.getTotalElements();
+        List<Comment> comments = commentPage.getContent();
+
+        return PageResponse.of(pageRequest.pageSize(), (int) totalCount, comments);
+    }
+
     @Transactional
-    public Comment updateComment(Long commentId, String userId, CommentRequest request) {
-        Comment comment = getComment(commentId);
-        
+    public Comment update(Long userId, Long boardId, Long postId, Long commentId, CommentRequest request) {
+        checkExistence(boardId, postId);
+
+        User user = userService.get(userId);
+        Comment comment = get(commentId);
+
         // Entity의 비즈니스 로직 사용
-        if (!comment.isWrittenBy(userId)) {
+        if (!comment.isWrittenBy(user.getEmail())) {
             throw new NoAuthorityException();
         }
-        
+
         comment.updateContent(request.content());
         return commentRepository.save(comment);
     }
 
     @Transactional
-    public ApiResponse deleteComment(Long commentId, String userId) {
-        Comment comment = getComment(commentId);
-        
+    public ApiResponse delete(Long userId, Long boardId, Long postId, Long commentId) {
+        checkExistence(boardId, postId);
+
+        User user = userService.get(userId);
+        Comment comment = get(commentId);
+
         // Entity의 비즈니스 로직 사용
-        if (!comment.isWrittenBy(userId)) {
+        if (!comment.isWrittenBy(user.getEmail())) {
             throw new NoAuthorityException();
         }
-        
+
         comment.decrementReplyCount();
         commentRepository.deleteById(commentId);
-        
+
         return new ApiResponse(ResultType.OK);
     }
 
-    public boolean isCommentExist(long postSeq) {
-        return commentRepository.countByPostId(postSeq) > 0;
+    public boolean isCommentExist(long postId) {
+        return commentRepository.countByPostId(postId) > 0;
     }
+
+    private void checkExistence(long boardSeq, long postId) {
+        boardService.validateBoardSeq(boardSeq);
+        postService.validatePostId(postId);
+    }
+
+    private String getUserId(long userSeq) {
+        User user = userService.get(userSeq);
+        return user.getEmail();
+    }
+
 }

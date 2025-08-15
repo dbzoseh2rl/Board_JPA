@@ -38,4 +38,5 @@ public class Board extends Timestamp {
     public boolean hasName(String name) {
         return this.name.equals(name);
     }
+
 }

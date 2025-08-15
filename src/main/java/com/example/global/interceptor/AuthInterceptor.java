@@ -13,7 +13,7 @@ import org.springframework.web.servlet.HandlerInterceptor;
 @RequiredArgsConstructor
 abstract public class AuthInterceptor implements HandlerInterceptor {
 
-    private static final String USER_SEQ_ATTRIBUTE_KEY = "userSeq";
+    private static final String USER_ATTRIBUTE_KEY = "userId";
 
     private final JwtUtil jwtUtil;
 
@@ -56,6 +56,7 @@ abstract public class AuthInterceptor implements HandlerInterceptor {
 
     private void setUserSeqToAttribute(HttpServletRequest request) {
         Long userSeq = jwtUtil.getUserSeqFromToken(this.token);
-        request.setAttribute(USER_SEQ_ATTRIBUTE_KEY, userSeq);
+        request.setAttribute(USER_ATTRIBUTE_KEY, userSeq);
     }
+
 }
