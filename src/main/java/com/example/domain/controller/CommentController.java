@@ -20,14 +20,8 @@ public class CommentController {
 
     @PostMapping
     public Comment createComment(PathVariableIdDto idDto, @RequestBody @Valid CommentRequest commentRequest) {
-        return commentService.create(
-                idDto.userId(),
-                idDto.boardId(),
-                idDto.postId(),
-                commentRequest
-        );
+        return commentService.create(idDto.userId(), idDto.boardId(), idDto.postId(), commentRequest);
     }
-
 
     @GetMapping("/{commentId}")
     public Comment getComment(PathVariableIdDto idDto) {
@@ -41,23 +35,12 @@ public class CommentController {
 
     @PutMapping("/{commentId}")
     public Comment updateComment(PathVariableIdDto idDto, @RequestBody @Valid CommentRequest body) {
-        return commentService.update(
-                idDto.userId(),
-                idDto.boardId(),
-                idDto.postId(),
-                idDto.commentId(),
-                body
-        );
+        return commentService.update(idDto.userId(), idDto.boardId(), idDto.postId(), idDto.commentId(), body);
     }
 
     @DeleteMapping("/{commentId}")
     public ApiResponse deleteComment(PathVariableIdDto idDto) {
-        return commentService.delete(
-                idDto.userId(),
-                idDto.boardId(),
-                idDto.postId(),
-                idDto.commentId()
-        );
+        return commentService.delete(idDto.userId(), idDto.boardId(), idDto.postId(), idDto.commentId());
     }
 
 }

@@ -28,12 +28,10 @@ public class PostController {
         return postService.getPostAndIncreaseViewCount(pathDto.userId(), pathDto.boardId(), pathDto.postId());
     }
 
-
     @DeleteMapping("/{postId}")
     public ApiResponse deletePost(PathVariableIdDto pathDto) {
         return postService.deletePost(pathDto.postId(), pathDto.userId());
     }
-
 
     @PostMapping
     public Post createPost(PathVariableIdDto pathDto, @RequestBody @Valid PostRequest postRequest) {
@@ -46,5 +44,3 @@ public class PostController {
     }
 
 }
-
-
