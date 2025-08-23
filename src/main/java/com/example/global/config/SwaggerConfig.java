@@ -1,4 +1,4 @@
-package com.example.global.common.config;
+package com.example.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,4 +34,5 @@ public class SwaggerConfig {
                 .description(API_DESCRIPTION)
                 .build();
     }
+
 }

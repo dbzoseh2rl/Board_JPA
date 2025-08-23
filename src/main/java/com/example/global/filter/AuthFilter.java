@@ -2,7 +2,7 @@ package com.example.global.filter;
 
 import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.response.ApiResponse;
-import com.example.global.common.util.JwtUtil;
+import com.example.global.util.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;

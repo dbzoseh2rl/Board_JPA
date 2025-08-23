@@ -1,7 +1,7 @@
 package com.example.global.interceptor;
 
-import com.example.global.common.exception.RefreshTokenRequiredException;
-import com.example.global.common.util.JwtUtil;
+import com.example.global.exception.RefreshTokenRequiredException;
+import com.example.global.util.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.stereotype.Component;

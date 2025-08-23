@@ -1,4 +1,4 @@
-package com.example.global.common.converter;
+package com.example.global.converter;
 
 
 import com.example.domain.dto.common.response.ApiResponse;

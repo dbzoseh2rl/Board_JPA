@@ -9,8 +9,8 @@ import com.example.domain.entity.Comment;
 import com.example.domain.entity.Post;
 import com.example.domain.entity.User;
 import com.example.domain.repository.CommentRepository;
-import com.example.global.common.exception.DataNotFoundException;
-import com.example.global.common.exception.NoAuthorityException;
+import com.example.global.exception.DataNotFoundException;
+import com.example.global.exception.NoAuthorityException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,14 +51,17 @@ public class CommentService {
     }
 
     public PageResponse<Comment> getComments(long postId, PageRequest pageRequest) {
+        // 1. Pageable
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 pageRequest.pageIndex() - 1,
                 pageRequest.pageSize()
         );
 
+        // 2. return 된 Page<Entity>
         Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
 
         long totalCount = commentPage.getTotalElements();
+        // 3. 깐다
         List<Comment> comments = commentPage.getContent();
 
         return PageResponse.of(pageRequest.pageSize(), (int) totalCount, comments);

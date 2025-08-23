@@ -2,7 +2,7 @@ package com.example.global.advice;
 
 import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.response.ErrorResponse;
-import com.example.global.common.exception.BaseException;
+import com.example.global.exception.BaseException;
 import io.jsonwebtoken.JwtException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,4 +1,4 @@
-package com.example.global.common.exception;
+package com.example.global.exception;
 
 import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.response.ErrorResponse;

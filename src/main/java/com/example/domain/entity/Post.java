@@ -1,7 +1,7 @@
 package com.example.domain.entity;
 
 import com.example.domain.dto.content.request.PostRequest;
-import com.example.global.common.model.Timestamp;
+import com.example.global.model.Timestamp;
 import jakarta.persistence.*;
 import lombok.*;
 
