@@ -12,6 +12,7 @@ import com.example.domain.repository.PostRepository;
 import com.example.global.exception.DataNotFoundException;
 import com.example.global.exception.InvalidParameterException;
 import com.example.global.exception.NoAuthorityException;
+import com.example.global.util.PageableUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class PostService {
     private final PostRepository postRepository;
 
     public PageResponse<Post> getPostList(PageRequest pageRequest, long boardSeq) {
+/*
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 pageRequest.pageIndex() - 1,  // record getter 사용
                 pageRequest.pageSize()
@@ -41,6 +43,14 @@ public class PostService {
         List<Post> postList = postPage.getContent();
 
         return PageResponse.of(pageRequest.pageSize(), totalCount, postList);
+*/
+        // 공통 유틸리티 사용
+        Pageable pageable = PageableUtil.toPageable(pageRequest);
+        Page<Post> postPage = postRepository.findByBoardId(boardSeq, pageable);
+
+        // 공통 응답 변환
+        return PageableUtil.toPageResponse(postPage, pageRequest);
+
     }
 
     public Post get(long postSeq) {

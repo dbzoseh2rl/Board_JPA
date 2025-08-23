@@ -11,6 +11,7 @@ import com.example.domain.entity.User;
 import com.example.domain.repository.CommentRepository;
 import com.example.global.exception.DataNotFoundException;
 import com.example.global.exception.NoAuthorityException;
+import com.example.global.util.PageableUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -51,6 +52,7 @@ public class CommentService {
     }
 
     public PageResponse<Comment> getComments(long postId, PageRequest pageRequest) {
+/*
         // 1. Pageable
         Pageable pageable = org.springframework.data.domain.PageRequest.of(
                 pageRequest.pageIndex() - 1,
@@ -65,6 +67,13 @@ public class CommentService {
         List<Comment> comments = commentPage.getContent();
 
         return PageResponse.of(pageRequest.pageSize(), (int) totalCount, comments);
+*/
+        // 공통 유틸리티 사용
+        Pageable pageable = PageableUtil.toPageable(pageRequest);
+        Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
+
+        // 공통 응답 변환
+        return PageableUtil.toPageResponse(commentPage, pageRequest);
     }
 
     @Transactional

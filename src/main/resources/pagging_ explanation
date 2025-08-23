@@ -1,0 +1,35 @@
+# Pageable 정보가 query에 포함 되는 과정
+1. PageRequest (pageIndex=2, pageSize=10)
+    ↓
+2. Pageable 생성 (page=1, size=10)  // Spring은 0부터 시작
+    ↓
+3. Repository 메서드 호출 (Pageable 전달)
+    ↓
+4. JPA가 Pageable 정보를 SQL에 반영
+    ↓
+5. 실제 DB 쿼리 실행 (LIMIT 10, 10)
+
+# 과정
+# 1. 본래 서비스에 포함되어있던 코드를 유틸로 빼서 관리
+//        // 1. Pageable
+//        Pageable pageable = org.springframework.data.domain.PageRequest.of(
+//                pageRequest.pageIndex() - 1,
+//                pageRequest.pageSize()
+//        );
+//
+//        // 2. return 된 Page<Entity>
+//        Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
+//
+//        long totalCount = commentPage.getTotalElements();
+//        // 3. 깐다
+//        List<Comment> comments = commentPage.getContent();
+//
+//        return PageResponse.of(pageRequest.pageSize(), (int) totalCount, comments);
+
+# 2. 아래와 같이 수정 가능
+        // 공통 유틸리티 사용
+        Pageable pageable = PageableUtil.toPageable(pageRequest);
+        Page<Comment> commentPage = commentRepository.findByPostId(postId, pageable);
+
+        // 공통 응답 변환
+        return PageableUtil.toPageResponse(commentPage, pageRequest);
