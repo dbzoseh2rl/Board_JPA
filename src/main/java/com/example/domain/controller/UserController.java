@@ -30,8 +30,8 @@ public class UserController {
     }
 
     @GetMapping("/refresh")
-    public UserWithTokenResponse refreshToken(@RequestAttribute long userSeq) {
-        return userService.refreshToken(userSeq);
+    public UserWithTokenResponse refreshToken(@RequestAttribute long userId) {
+        return userService.refreshToken(userId);
     }
 
 }
