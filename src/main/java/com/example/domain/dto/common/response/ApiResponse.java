@@ -13,12 +13,12 @@ public record ApiResponse(
 
 ) {
 
-    public ApiResponse(ResultType resultType) {
-        this(resultType, null);
+    public static ApiResponse of(ResultType resultType) {
+        return new ApiResponse(resultType, null);
     }
 
-    public ApiResponse(Object data) {
-        this(ResultType.OK, data);
+    public static ApiResponse of(Object data) {
+        return new ApiResponse(ResultType.OK, data);
     }
 
     @JsonIgnore

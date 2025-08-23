@@ -1,5 +1,7 @@
 package com.example.domain.dto.common.response;
 
+import org.springframework.data.domain.Page;
+
 import java.util.List;
 
 public record PageResponse<T>(
@@ -9,9 +11,11 @@ public record PageResponse<T>(
         List<T> list
 
 ) {
-    // 정적 팩토리 메서드로 페이지 계산 로직 처리
-    public static <T> PageResponse<T> of(int pageSize, int totalCount, List<T> list) {
-        int totalPage = (totalCount + pageSize - 1) / pageSize; // 올림 계산
-        return new PageResponse<>(totalCount, totalPage, list);
+
+    public static <T> PageResponse<T> of(int pageSize, Page<T> page) {
+        int totalCount = (int) page.getTotalElements();
+        int totalPage = (totalCount + pageSize - 1) / pageSize;
+        return new PageResponse<>(totalCount, totalPage, page.getContent());
     }
+
 }

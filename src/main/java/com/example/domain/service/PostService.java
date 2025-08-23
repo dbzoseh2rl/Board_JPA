@@ -1,8 +1,6 @@
 package com.example.domain.service;
 
-import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.request.PageRequest;
-import com.example.domain.dto.common.response.ApiResponse;
 import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.dto.content.request.PostRequest;
 import com.example.domain.entity.Board;
@@ -12,14 +10,11 @@ import com.example.domain.repository.PostRepository;
 import com.example.global.exception.DataNotFoundException;
 import com.example.global.exception.InvalidParameterException;
 import com.example.global.exception.NoAuthorityException;
-import com.example.global.util.PageableUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,26 +26,12 @@ public class PostService {
     private final PostRepository postRepository;
 
     public PageResponse<Post> getPostList(PageRequest pageRequest, long boardSeq) {
-/*
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                pageRequest.pageIndex() - 1,  // record getter 사용
-                pageRequest.pageSize()
-        );
-
-        Page<Post> postPage = postRepository.findByBoardId(boardSeq, pageable);
-
-        int totalCount = (int) postPage.getTotalElements();
-        List<Post> postList = postPage.getContent();
-
-        return PageResponse.of(pageRequest.pageSize(), totalCount, postList);
-*/
         // 공통 유틸리티 사용
-        Pageable pageable = PageableUtil.toPageable(pageRequest);
+        Pageable pageable = PageRequest.toPageable(pageRequest);
         Page<Post> postPage = postRepository.findByBoardId(boardSeq, pageable);
 
         // 공통 응답 변환
-        return PageableUtil.toPageResponse(postPage, pageRequest);
-
+        return PageResponse.of(pageRequest.pageSize(), postPage);
     }
 
     public Post get(long postSeq) {
@@ -90,7 +71,7 @@ public class PostService {
     }
 
     @Transactional
-    public ApiResponse deletePost(Long postId, Long userSeq) {
+    public void deletePost(Long postId, Long userSeq) {
         Post post = get(postId);
         String userId = userService.get(userSeq).getEmail();
         // Entity의 비즈니스 로직 사용
@@ -99,7 +80,6 @@ public class PostService {
         }
 
         postRepository.deleteById(postId);
-        return new ApiResponse(ResultType.OK);
     }
 
     public void validatePostId(long postSeq) {
@@ -110,11 +90,6 @@ public class PostService {
 
     public Post getValidatedPost(long userSeq, long boardSeq, long postSeq) {
         Post post = get(postSeq);
-
-        if (post == null) {
-            throw new DataNotFoundException();
-        }
-
         checkEquality(post, userSeq, boardSeq);
         return post;
     }

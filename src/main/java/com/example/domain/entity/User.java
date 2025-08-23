@@ -34,7 +34,7 @@ public class User extends Timestamp {
 
     public static User from(UserResponse userResponse) {
         return User.builder()
-                .email(userResponse.id())        // record의 getter 메서드 사용
+                .email(userResponse.id())          // record의 getter 메서드 사용
                 .password(userResponse.password()) // record의 getter 메서드 사용
                 .build();
     }

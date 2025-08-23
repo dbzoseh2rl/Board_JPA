@@ -26,7 +26,7 @@ public class ResultConverter extends MappingJackson2HttpMessageConverter {
         if (object instanceof ApiResponse) {
             apiResponse = (ApiResponse) object;
         } else {
-            apiResponse = new ApiResponse(object);
+            apiResponse = ApiResponse.of(object);
         }
         
         // record의 getter 메서드 사용

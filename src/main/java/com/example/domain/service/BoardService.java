@@ -6,14 +6,13 @@ import com.example.domain.entity.Board;
 import com.example.domain.repository.BoardRepository;
 import com.example.global.exception.DataNotFoundException;
 import com.example.global.exception.UserNotFoundException;
-import com.example.global.util.PageableUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import static com.example.domain.dto.common.request.PageRequest.toPageable;
 
 @Service
 @RequiredArgsConstructor
@@ -22,25 +21,12 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     public PageResponse<Board> getBoardList(PageRequest pageRequest) {
-/*
-        Pageable pageable = org.springframework.data.domain.PageRequest.of(
-                pageRequest.pageIndex() - 1,  // record getter 사용
-                pageRequest.pageSize()
-        );
-        Page<Board> boardPage = boardRepository.findAll(pageable);
-
-        long totalCount = boardPage.getTotalElements();
-        List<Board> boardList = boardPage.getContent();
-
-        return PageResponse.of(pageRequest.pageSize(), (int) totalCount, boardList);
-*/
         // 공통 유틸리티 사용
-        Pageable pageable = PageableUtil.toPageable(pageRequest);
+        Pageable pageable = toPageable(pageRequest);
         Page<Board> boardPage = boardRepository.findAll(pageable);
 
         // 공통 응답 변환
-        return PageableUtil.toPageResponse(boardPage, pageRequest);
-
+        return PageResponse.of(pageRequest.pageSize(), boardPage);
     }
 
     public void validateBoardSeq(long boardSeq) {

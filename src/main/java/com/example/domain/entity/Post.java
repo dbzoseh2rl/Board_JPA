@@ -10,8 +10,6 @@ import lombok.*;
 @Setter
 @Table(name = "posts")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Builder
-@AllArgsConstructor
 public class Post extends Timestamp {
 
     @Id
@@ -35,6 +33,18 @@ public class Post extends Timestamp {
     private int viewCnt;
 
     private int replyCnt;
+
+    @Builder
+    private Post(long id, User user, Board board, String name, String title, String content, int viewCnt, int replyCnt) {
+        this.id = id;
+        this.user = user;
+        this.board = board;
+        this.name = name;
+        this.title = title;
+        this.content = content;
+        this.viewCnt = viewCnt;
+        this.replyCnt = replyCnt;
+    }
 
     public static Post from(User user, Board board, PostRequest postRequest) {
         return Post.builder()

@@ -1,8 +1,7 @@
 package com.example.domain.controller;
 
 import com.example.domain.dto.common.request.PageRequest;
-import com.example.domain.dto.common.response.PageResponse;
-import com.example.domain.entity.Board;
+import com.example.domain.dto.common.response.ApiResponse;
 import com.example.domain.service.BoardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +16,8 @@ public class BoardController {
     private final BoardService boardService;
 
     @GetMapping
-    public PageResponse<Board> getBoardList(PageRequest pageRequest) {
-        return boardService.getBoardList(pageRequest);
+    public ApiResponse getBoardList(PageRequest pageRequest) {
+        return ApiResponse.of(boardService.getBoardList(pageRequest));
     }
 
 }

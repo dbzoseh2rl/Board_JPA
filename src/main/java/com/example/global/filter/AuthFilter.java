@@ -58,7 +58,7 @@ public class AuthFilter extends OncePerRequestFilter {
     }
 
     private void setHttpServletResponse(HttpServletResponse response, ResultType resultType) throws IOException {
-        ApiResponse apiResponse = new ApiResponse(resultType);
+        ApiResponse apiResponse = ApiResponse.of(resultType);
         
         // record의 getter 메서드 사용: getStatus() → status()
         response.setStatus(apiResponse.status().value());

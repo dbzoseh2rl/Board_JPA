@@ -1,11 +1,10 @@
 package com.example.domain.controller;
 
+import com.example.domain.dto.common.ResultType;
 import com.example.domain.dto.common.request.PageRequest;
 import com.example.domain.dto.common.request.PathVariableIdDto;
 import com.example.domain.dto.common.response.ApiResponse;
-import com.example.domain.dto.common.response.PageResponse;
 import com.example.domain.dto.content.request.PostRequest;
-import com.example.domain.entity.Post;
 import com.example.domain.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,28 +18,29 @@ public class PostController {
     private final PostService postService;
 
     @GetMapping
-    public PageResponse<Post> getPostList(PathVariableIdDto pathDto, PageRequest pageRequest) {
-        return postService.getPostList(pageRequest, pathDto.boardId());
+    public ApiResponse getPostList(PathVariableIdDto pathDto, PageRequest pageRequest) {
+        return ApiResponse.of(postService.getPostList(pageRequest, pathDto.boardId()));
     }
 
     @GetMapping("/{postId}")
-    public Post getPost(PathVariableIdDto pathDto) {
-        return postService.getPostAndIncreaseViewCount(pathDto.userId(), pathDto.boardId(), pathDto.postId());
+    public ApiResponse getPost(PathVariableIdDto pathDto) {
+        return ApiResponse.of(postService.getPostAndIncreaseViewCount(pathDto.userId(), pathDto.boardId(), pathDto.postId()));
     }
 
     @DeleteMapping("/{postId}")
     public ApiResponse deletePost(PathVariableIdDto pathDto) {
-        return postService.deletePost(pathDto.postId(), pathDto.userId());
+        postService.deletePost(pathDto.postId(), pathDto.userId());
+        return ApiResponse.of(ResultType.OK);
     }
 
     @PostMapping
-    public Post createPost(PathVariableIdDto pathDto, @RequestBody @Valid PostRequest postRequest) {
-        return postService.createPost(pathDto.userId(), pathDto.boardId(), postRequest);
+    public ApiResponse createPost(PathVariableIdDto pathDto, @RequestBody @Valid PostRequest postRequest) {
+        return ApiResponse.of(postService.createPost(pathDto.userId(), pathDto.boardId(), postRequest));
     }
 
     @PutMapping("/{postId}")
-    public Post modifyPost(PathVariableIdDto pathDto, @RequestBody @Valid PostRequest body) {
-        return postService.updatePost(pathDto.postId(), pathDto.userId(), body);
+    public ApiResponse modifyPost(PathVariableIdDto pathDto, @RequestBody @Valid PostRequest body) {
+        return ApiResponse.of(postService.updatePost(pathDto.postId(), pathDto.userId(), body));
     }
 
 }
