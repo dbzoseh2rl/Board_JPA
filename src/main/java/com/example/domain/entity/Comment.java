@@ -1,7 +1,7 @@
 package com.example.domain.entity;
 
 import com.example.domain.dto.content.request.CommentRequest;
-import com.example.global.model.Timestamp;
+import com.example.global.model.AuditTimestamp;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +9,7 @@ import lombok.*;
 @Getter @Setter
 @Table(name = "comments")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends Timestamp {
+public class Comment extends AuditTimestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

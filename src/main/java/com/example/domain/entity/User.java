@@ -1,7 +1,7 @@
 package com.example.domain.entity;
 
 import com.example.domain.dto.user.UserResponse;
-import com.example.global.model.Timestamp;
+import com.example.global.model.AuditTimestamp;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,7 +10,7 @@ import lombok.*;
 @Setter
 @Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class User extends Timestamp {
+public class User extends AuditTimestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

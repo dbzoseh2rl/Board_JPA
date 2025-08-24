@@ -1,0 +1,23 @@
+전체 실행 흐름 예시
+프론트에서 게시글 생성 요청 시:
+1. 프론트: POST /boards/1/posts + JSON 데이터
+2. Controller: PostController.createPost() 호출
+3. Service: PostService.createPost() 호출
+4. Repository: PostRepository.save() 호출
+5. Entity: Post.from() 정적 팩토리 메서드로 객체 생성
+6. DB: MySQL에 데이터 저장
+7. 응답: ApiResponse 형태로 프론트에 반환
+
+1. HTTP 요청 수신
+2. Controller 레이어 (1단계)
+역할: HTTP 요청/응답 처리
+기능: URL 매핑, 파라미터 검증, Service 호출
+3. Service 레이어 (2단계)
+역할: 비즈니스 로직 처리
+기능: 데이터 검증, 트랜잭션 관리, Repository 호출
+4. Repository 레이어 (3단계)
+역할: 데이터베이스 접근
+기능: SQL 쿼리 실행, 데이터 CRUD
+5. Entity 레이어 (4단계)
+역할: 데이터 모델링
+기능: 데이터 구조 정의, 비즈니스 로직

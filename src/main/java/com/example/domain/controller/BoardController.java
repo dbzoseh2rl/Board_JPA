@@ -4,9 +4,7 @@ import com.example.domain.dto.common.request.PageRequest;
 import com.example.domain.dto.common.response.ApiResponse;
 import com.example.domain.service.BoardService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/boards")
@@ -18,6 +16,11 @@ public class BoardController {
     @GetMapping
     public ApiResponse getBoardList(PageRequest pageRequest) {
         return ApiResponse.of(boardService.getBoardList(pageRequest));
+    }
+
+    @PostMapping
+    public ApiResponse createBoard(@RequestParam String name) {
+        return ApiResponse.of(boardService.createBoard(name));
     }
 
 }
