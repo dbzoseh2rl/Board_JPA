@@ -2,6 +2,14 @@ jwt:
   secret: "THISISJWTSECRETKEYTHISISJWTSECRETKEY"
   expiration: 1800
 
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    url: /v3/api-docs
+    try-it-out-enabled: true
+    persist-authorization: true
+
 ---
 
 spring:
@@ -19,6 +27,10 @@ spring:
     hibernate:
       ddl-auto: update
     open-in-view: true
+
+logging:
+  level:
+    root: info
 
 ---
 

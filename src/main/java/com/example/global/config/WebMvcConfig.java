@@ -35,10 +35,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                         "/**",  // 혹시 모를 다른 auth 경로
                         "/auths/**",  // 혹시 모를 다른 auth 경로
                         "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
+                        "/api-docs/**",
                         "/swagger-resources/**",
-                        "/webjars/**",
                         "/error"
                 );
 
