@@ -51,7 +51,7 @@ public class BoardService {
         return boardRepository.save(board);
     }
 
-    public boolean isBoardExists(String name) {
+        public boolean isBoardExists(String name) {
         return boardRepository.findAll().stream().anyMatch(board -> board.hasName(name));
     }
 
