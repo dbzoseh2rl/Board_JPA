@@ -85,3 +85,4 @@ jobs:
         run: |
           echo "Performing health check..."
           curl -f http://localhost:8080/actuator/health || echo "Health check failed - application may not be ready yet"
+
