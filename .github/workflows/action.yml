@@ -47,18 +47,41 @@ jobs:
           echo "JAR files created:"
           ls -la build/libs/
 
-#  dependency-submission:
-#    runs-on: ubuntu-latest
-#    permissions:
-#      contents: write
-#
-#    steps:
-#      - uses: actions/checkout@v4
-#      - name: Set up JDK 21
-#        uses: actions/setup-java@v4
-#        with:
-#          java-version: '21'
-#          distribution: 'temurin'
-#
-#      - name: Generate and submit dependency graph
-#        uses: gradle/actions/dependency-submission@af1da67850ed9a4cedd57bfd976089dd991e2582
+  # CD: 로컬에서 JAR 실행
+  deploy-local:
+    runs-on: self-hosted    # 로컬에서 실행
+    needs: build            # 빌드 완료 후 실행
+
+    steps:
+      - name: Download JAR from GitHub Actions
+        uses: actions/download-artifact@v4
+        with:
+          name: board-application
+
+      - name: Stop existing application
+        run: |
+          echo "Stopping existing application..."
+          pkill -f "board-application.jar" || echo "No existing application found"
+
+      - name: Deploy and run on local JVM
+        run: |
+          echo "Starting application on local JVM..."
+          nohup java -jar board-application.jar > app.log 2>&1 &
+          echo "Application started with PID: $!"
+
+      - name: Wait for application to start
+        run: |
+          echo "Waiting for application to start..."
+          sleep 10
+
+      - name: Check application status
+        run: |
+          echo "Checking application status..."
+          ps aux | grep "board-application.jar" | grep -v grep || echo "Application not running"
+          echo "Application logs:"
+          tail -20 app.log || echo "No log file found"
+
+      - name: Health check
+        run: |
+          echo "Performing health check..."
+          curl -f http://localhost:8080/actuator/health || echo "Health check failed - application may not be ready yet"
