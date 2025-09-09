@@ -70,6 +70,7 @@ jobs:
           source: "./artifacts/*.jar"
           target: "/tmp/artifacts"
           strip_components: 0
+          debug: true  # 디버그 모드 추가
 
       - name: Execute local deployment script
         uses: appleboy/ssh-action@v0.1.5
