@@ -106,16 +106,16 @@ jobs:
           cd deploy
           tar -czf ../deployment.tar.gz .
 
-      - name: Deploy to Linux Server
+      - name: Deploy JAR directly to Linux Server
         uses: appleboy/scp-action@v0.1.4
         with:
           host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 2000
-          source: "deployment.tar.gz"
-          target: "/home/${{ secrets.SERVER_USER }}/"
-          strip_components: 0
+          source: "deploy/*"
+          target: "/home/${{ secrets.SERVER_USER }}/board-app/"
+          strip_components: 1
           debug: true
 
       - name: Extract and Deploy on Server
@@ -128,11 +128,10 @@ jobs:
           script: |
             # 현재 디렉토리와 파일 확인
             echo "Current directory: $(pwd)"
-            echo "Files in home directory:"
-            ls -la ~/
+            echo "Files in board-app directory:"
+            ls -la ~/board-app/
             
-            # 배포 디렉토리 생성
-            mkdir -p ~/board-app
+            # 배포 디렉토리로 이동
             cd ~/board-app
             
             # 기존 애플리케이션 종료
@@ -147,19 +146,6 @@ jobs:
                 fi
               fi
               rm -f app.pid
-            fi
-            
-            # 배포 파일 확인 및 압축 해제
-            cd ~
-            if [ -f "deployment.tar.gz" ]; then
-              echo "deployment.tar.gz found, extracting..."
-              tar -xzf deployment.tar.gz -C ~/board-app/
-              rm deployment.tar.gz
-            else
-              echo "ERROR: deployment.tar.gz not found!"
-              echo "Available files:"
-              ls -la ~/
-              exit 1
             fi
             
             # 실행 권한 부여
