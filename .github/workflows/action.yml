@@ -64,9 +64,24 @@ jobs:
       - name: Create deployment directory and copy files
         run: |
           mkdir -p deploy
-          cp ./artifacts/*.jar deploy/app.jar
+          echo "Checking artifacts directory:"
+          ls -la ./artifacts/
+          echo "Finding JAR files:"
+          find ./artifacts -name "*.jar" -type f
+          echo "Copying JAR file:"
+          JAR_FILE=$(find ./artifacts -name "*.jar" -type f | head -1)
+          if [ -n "$JAR_FILE" ]; then
+            cp "$JAR_FILE" deploy/app.jar
+            echo "JAR file copied successfully"
+          else
+            echo "No JAR file found in artifacts directory"
+            exit 1
+          fi
+          echo "Copying DeployServer.sh:"
           cp DeployServer.sh deploy/
           chmod +x deploy/DeployServer.sh
+          echo "Deploy directory contents:"
+          ls -la deploy/
 
       - name: Create deployment package
         run: |
