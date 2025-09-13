@@ -48,7 +48,8 @@ jobs:
           echo "JAR files created:"
           ls -la build/libs/
 
-  deploy-local-windows:
+  # 리눅스 서버 배포
+  deploy-linux-server:
     runs-on: ubuntu-latest
     needs: build
     if: github.ref == 'refs/heads/master'
@@ -60,78 +61,101 @@ jobs:
           name: board-application
           path: ./artifacts
 
-      - name: Upload JAR to Windows local PC
+      - name: Create deployment directory
+        run: mkdir -p deploy
+
+      - name: Copy JAR file to deployment directory
+        run: |
+          cp ./artifacts/*.jar deploy/app.jar
+          cp DeployServer.sh deploy/
+          chmod +x deploy/DeployServer.sh
+
+      - name: Create deployment package
+        run: |
+          cd deploy
+          tar -czf ../deployment.tar.gz .
+
+      - name: Deploy to Linux Server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: ${{ secrets.LOCAL_HOST }}
-          username: ${{ secrets.LOCAL_USERNAME }}
-          key: ${{ secrets.LOCAL_SSH_KEY }}
-          port: ${{ secrets.LOCAL_SSH_PORT }}
-          source: "./artifacts/*.jar"
-          target: "C:\\Users\\${{ secrets.LOCAL_USERNAME }}\\Board_JPA-master\\artifacts"
-          debug: true
+          host: 192.168.45.133
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          source: "deployment.tar.gz"
+          target: "/home/${{ secrets.SERVER_USER }}/"
+          strip_components: 0
 
-      - name: Execute PowerShell deployment on Windows
-        uses: appleboy/ssh-action@v0.1.5
+      - name: Extract and Deploy on Server
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.LOCAL_HOST }}
-          username: ${{ secrets.LOCAL_USERNAME }}
-          key: ${{ secrets.LOCAL_SSH_KEY }}
-          port: ${{ secrets.LOCAL_SSH_PORT }}
+          host: 192.168.45.133
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
           script: |
-            Write-Host "========================================"
-            Write-Host "Executing Windows Deployment Script"
-            Write-Host "========================================"
-            Write-Host "Date: $(Get-Date)"
-            Write-Host "Host: $(hostname)"
+            # 배포 디렉토리 생성
+            mkdir -p ~/board-app
+            cd ~/board-app
+            
+            # 기존 애플리케이션 종료
+            if [ -f app.pid ]; then
+              PID=$(cat app.pid)
+              if ps -p $PID > /dev/null 2>&1; then
+                echo "Stopping existing application (PID: $PID)..."
+                kill $PID
+                sleep 3
+                if ps -p $PID > /dev/null 2>&1; then
+                  kill -9 $PID
+                fi
+              fi
+              rm -f app.pid
+            fi
+            
+            # 배포 파일 압축 해제
+            cd ~
+            tar -xzf deployment.tar.gz -C ~/board-app/
+            rm deployment.tar.gz
+            
+            # 실행 권한 부여
+            chmod +x ~/board-app/DeployServer.sh
+            
+            # 애플리케이션 실행
+            cd ~/board-app
+            ./DeployServer.sh
 
-            $deployPath = "C:\Users\${{ secrets.LOCAL_USERNAME }}\Board_JPA-master\artifacts"
-            Set-Location $deployPath
-
-            if (Test-Path ".\deploy-local.ps1") {
-                Write-Host "Running deploy-local.ps1..."
-                powershell -ExecutionPolicy Bypass -File ".\deploy-local.ps1"
-            } else {
-                Write-Host "ERROR: deploy-local.ps1 not found!"
-                exit 1
-            }
-
-            Write-Host "Windows deployment script execution completed!"
-
-
-  # SSH를 통한 원격 배포 (주석처리)
-  # deploy-local-ssh:
-  #   runs-on: ubuntu-latest
-  #   needs: build
-  #   if: github.ref == 'refs/heads/master'
-  #
-  #   steps:
-  #     - name: Download JAR artifacts
-  #       uses: actions/download-artifact@v4
-  #       with:
-  #         name: board-application
-  #         path: ./artifacts
-  #
-  #     - name: Deploy to local PC via SSH
-  #       uses: appleboy/ssh-action@v0.1.5
-  #       with:
-  #         host: ${{ secrets.LOCAL_HOST }}
-  #         username: ${{ secrets.LOCAL_USERNAME }}
-  #         key: ${{ secrets.LOCAL_SSH_KEY }}
-  #         port: ${{ secrets.LOCAL_SSH_PORT }}
-  #         script: |
-  #           # SSH 스크립트 내용 (주석처리)
-  #
-  #     - name: Upload JAR to local PC
-  #       uses: appleboy/scp-action@v0.1.4
-  #       with:
-  #         host: ${{ secrets.LOCAL_HOST }}
-  #         username: ${{ secrets.LOCAL_USERNAME }}
-  #         key: ${{ secrets.LOCAL_SSH_KEY }}
-  #         port: ${{ secrets.LOCAL_SSH_PORT }}
-  #         source: "./artifacts/*.jar"
-  #         target: "/tmp/artifacts"
-  #         strip_components: 0
+      - name: Health Check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: 192.168.45.133
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 22
+          script: |
+            echo "Checking application status..."
+            sleep 10
+            
+            # 프로세스 확인
+            if ps aux | grep -v grep | grep "java.*app.jar" > /dev/null; then
+              echo " Application is running"
+              
+              # 포트 확인
+              if netstat -tlnp 2>/dev/null | grep :8080 > /dev/null; then
+                echo " Port 8080 is listening"
+              else
+                echo " Port 8080 is not listening"
+              fi
+              
+              # 로그 확인
+              echo "Recent logs:"
+              tail -n 10 ~/board-app/app.log || echo "No log file found"
+              
+            else
+              echo " Application is not running"
+              echo "Checking logs for errors:"
+              tail -n 20 ~/board-app/app.log || echo "No log file found"
+              exit 1
+            fi
 
 
 
