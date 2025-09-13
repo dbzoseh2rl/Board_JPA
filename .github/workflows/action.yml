@@ -106,19 +106,10 @@ jobs:
           cd deploy
           tar -czf ../deployment.tar.gz .
 
-      - name: Prepare deployment files
+      - name: Create simple deployment script
         run: |
-          echo "Reading JAR file and converting to base64..."
-          JAR_FILE=$(find ./deploy -name "*.jar" -type f | head -1)
-          JAR_B64=$(base64 -w 0 "$JAR_FILE")
-          echo "JAR_B64=$JAR_B64" >> $GITHUB_ENV
-          
-          echo "Reading DeployServer.sh..."
-          if [ -f "./deploy/DeployServer.sh" ]; then
-            DEPLOY_SCRIPT=$(base64 -w 0 ./deploy/DeployServer.sh)
-          else
-            # Create default script if not found
-            cat > temp_script.sh << 'EOF'
+          echo "Creating deployment script..."
+          cat > simple_deploy.sh << 'EOF'
           #!/bin/bash
           echo "Starting Spring Boot application..."
           nohup java -jar app.jar > app.log 2>&1 &
@@ -126,10 +117,9 @@ jobs:
           echo $PID > app.pid
           echo "Application started with PID: $PID"
           EOF
-            DEPLOY_SCRIPT=$(base64 -w 0 temp_script.sh)
-            rm temp_script.sh
-          fi
-          echo "DEPLOY_SCRIPT=$DEPLOY_SCRIPT" >> $GITHUB_ENV
+          
+          echo "Script created successfully"
+          ls -la simple_deploy.sh
 
       - name: Extract and Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
@@ -157,22 +147,30 @@ jobs:
               rm -f app.pid
             fi
             
-            # JAR 파일 생성
-            echo "Creating JAR file..."
-            echo "${{ env.JAR_B64 }}" | base64 -d > app.jar
-            
-            # DeployServer.sh 스크립트 생성
-            echo "Creating deployment script..."
-            echo "${{ env.DEPLOY_SCRIPT }}" | base64 -d > DeployServer.sh
+            # 간단한 배포 스크립트 생성
+            cat > DeployServer.sh << 'EOF'
+            #!/bin/bash
+            echo "Starting Spring Boot application..."
+            nohup java -jar app.jar > app.log 2>&1 &
+            PID=$!
+            echo $PID > app.pid
+            echo "Application started with PID: $PID"
+            EOF
             chmod +x DeployServer.sh
             
             # 파일 확인
-            echo "Files created:"
+            echo "Current directory contents:"
             ls -la ~/board-app/
             
-            # 애플리케이션 실행
-            echo "Starting application..."
-            ./DeployServer.sh
+            # JAR 파일이 있는지 확인 후 애플리케이션 실행
+            if [ -f "app.jar" ]; then
+              echo "Starting application..."
+              ./DeployServer.sh
+            else
+              echo "ERROR: app.jar not found!"
+              echo "This deployment method needs SCP to work properly."
+              exit 1
+            fi
 
       - name: Health Check
         uses: appleboy/ssh-action@v1.0.3
