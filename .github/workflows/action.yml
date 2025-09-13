@@ -116,6 +116,7 @@ jobs:
           source: "deployment.tar.gz"
           target: "/home/${{ secrets.SERVER_USER }}/"
           strip_components: 0
+          debug: true
 
       - name: Extract and Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
@@ -125,6 +126,11 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 2000
           script: |
+            # 현재 디렉토리와 파일 확인
+            echo "Current directory: $(pwd)"
+            echo "Files in home directory:"
+            ls -la ~/
+            
             # 배포 디렉토리 생성
             mkdir -p ~/board-app
             cd ~/board-app
@@ -143,10 +149,18 @@ jobs:
               rm -f app.pid
             fi
             
-            # 배포 파일 압축 해제
+            # 배포 파일 확인 및 압축 해제
             cd ~
-            tar -xzf deployment.tar.gz -C ~/board-app/
-            rm deployment.tar.gz
+            if [ -f "deployment.tar.gz" ]; then
+              echo "deployment.tar.gz found, extracting..."
+              tar -xzf deployment.tar.gz -C ~/board-app/
+              rm deployment.tar.gz
+            else
+              echo "ERROR: deployment.tar.gz not found!"
+              echo "Available files:"
+              ls -la ~/
+              exit 1
+            fi
             
             # 실행 권한 부여
             chmod +x ~/board-app/DeployServer.sh
