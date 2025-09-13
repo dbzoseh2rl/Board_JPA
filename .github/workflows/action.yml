@@ -109,7 +109,7 @@ jobs:
       - name: Deploy to Linux Server
         uses: appleboy/scp-action@v0.1.4
         with:
-          host: 192.168.45.133
+          host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
@@ -120,7 +120,7 @@ jobs:
       - name: Extract and Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 192.168.45.133
+          host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
@@ -158,7 +158,7 @@ jobs:
       - name: Health Check
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: 192.168.45.133
+          host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
