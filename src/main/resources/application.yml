@@ -40,10 +40,14 @@ spring:
       on-profile: dg
 
   datasource:
-    url: jdbc:mysql://192.168.45.133:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.45.133:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true&autoReconnect=true&failOverReadOnly=false&maxReconnects=10
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
+    hikari:
+      connection-timeout: 30000
+      maximum-pool-size: 10
+      minimum-idle: 5
 
   jpa:
     hibernate:

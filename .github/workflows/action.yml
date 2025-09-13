@@ -129,6 +129,34 @@ jobs:
             # root 권한으로 전환
             sudo su - << 'ROOT_SCRIPT'
             
+            # MySQL 설정 및 시작
+            echo "Setting up MySQL..."
+            
+            # MySQL 서비스 시작
+            systemctl start mysql || service mysql start
+            
+            # MySQL 설정 파일 백업 및 수정
+            if [ -f /etc/mysql/mysql.conf.d/mysqld.cnf ]; then
+              cp /etc/mysql/mysql.conf.d/mysqld.cnf /etc/mysql/mysql.conf.d/mysqld.cnf.backup
+              sed -i 's/bind-address.*=.*127.0.0.1/bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+              sed -i 's/mysqlx-bind-address.*=.*127.0.0.1/mysqlx-bind-address = 0.0.0.0/' /etc/mysql/mysql.conf.d/mysqld.cnf
+            fi
+            
+            # MySQL 재시작
+            systemctl restart mysql || service mysql restart
+            
+            # MySQL 외부 접속 사용자 생성
+            mysql -u root -e "
+              CREATE DATABASE IF NOT EXISTS mydb;
+              CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
+              GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+              FLUSH PRIVILEGES;
+            " 2>/dev/null || echo "MySQL user setup completed"
+            
+            # MySQL 포트 확인
+            echo "MySQL status:"
+            netstat -tlnp | grep :3306 || echo "MySQL port 3306 not listening"
+            
             # 배포 디렉토리 생성 및 정리
             mkdir -p /root/board-app
             cd /root/board-app
@@ -184,6 +212,14 @@ jobs:
           script: |
             echo "Checking application status..."
             sleep 10
+            
+            # MySQL 상태 확인
+            echo "Checking MySQL status..."
+            if netstat -tlnp 2>/dev/null | grep :3306 > /dev/null; then
+              echo " MySQL port 3306 is listening"
+            else
+              echo " MySQL port 3306 is not listening"
+            fi
             
             # 프로세스 확인
             if ps aux | grep -v grep | grep "java.*app.jar" > /dev/null; then
