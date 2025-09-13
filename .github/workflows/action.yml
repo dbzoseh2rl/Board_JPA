@@ -119,13 +119,13 @@ jobs:
           else
             # Create default script if not found
             cat > temp_script.sh << 'EOF'
-#!/bin/bash
-echo "Starting Spring Boot application..."
-nohup java -jar app.jar > app.log 2>&1 &
-PID=$!
-echo $PID > app.pid
-echo "Application started with PID: $PID"
-EOF
+          #!/bin/bash
+          echo "Starting Spring Boot application..."
+          nohup java -jar app.jar > app.log 2>&1 &
+          PID=$!
+          echo $PID > app.pid
+          echo "Application started with PID: $PID"
+          EOF
             DEPLOY_SCRIPT=$(base64 -w 0 temp_script.sh)
             rm temp_script.sh
           fi
