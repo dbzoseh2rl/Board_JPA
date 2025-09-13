@@ -61,11 +61,9 @@ jobs:
           name: board-application
           path: ./artifacts
 
-      - name: Create deployment directory
-        run: mkdir -p deploy
-
-      - name: Copy JAR file to deployment directory
+      - name: Create deployment directory and copy files
         run: |
+          mkdir -p deploy
           cp ./artifacts/*.jar deploy/app.jar
           cp DeployServer.sh deploy/
           chmod +x deploy/DeployServer.sh
