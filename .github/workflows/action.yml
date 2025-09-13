@@ -112,7 +112,7 @@ jobs:
           host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
+          port: 2000
           source: "deployment.tar.gz"
           target: "/home/${{ secrets.SERVER_USER }}/"
           strip_components: 0
@@ -123,7 +123,7 @@ jobs:
           host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
+          port: 2000
           script: |
             # 배포 디렉토리 생성
             mkdir -p ~/board-app
@@ -161,7 +161,7 @@ jobs:
           host: 211.209.1.229
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          port: 22
+          port: 2000
           script: |
             echo "Checking application status..."
             sleep 10
