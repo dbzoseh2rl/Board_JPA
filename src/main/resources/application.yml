@@ -12,25 +12,25 @@ springdoc:
 
 ---
 
-spring:
-  config:
-    activate:
-      on-profile: ty
+# spring:
+#   config:
+#     activate:
+#       on-profile: ty
 
-  datasource:
-    url: jdbc:mysql://localhost:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: root
+#   datasource:
+#     url: jdbc:mysql://localhost:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+#     driver-class-name: com.mysql.cj.jdbc.Driver
+#     username: root
+#     password: root
 
-  jpa:
-    hibernate:
-      ddl-auto: update
-    open-in-view: true
+#   jpa:
+#     hibernate:
+#       ddl-auto: update
+#     open-in-view: true
 
-logging:
-  level:
-    root: info
+# logging:
+#   level:
+#     root: info
 
 ---
 
@@ -40,7 +40,7 @@ spring:
       on-profile: dg
 
   datasource:
-    url: jdbc:mysql://localhost:3308/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://192.168.45.133:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: root
