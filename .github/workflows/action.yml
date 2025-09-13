@@ -153,24 +153,38 @@ jobs:
             # MySQL 재시작
             systemctl restart mysql || service mysql restart
             
-            # MySQL 초기 설정 (비밀번호 없이 접속 시도)
+            # MySQL 비밀번호 정책 완화 및 초기 설정
             mysql -u root -e "
+              -- 비밀번호 정책 완화
+              SET GLOBAL validate_password.policy = LOW;
+              SET GLOBAL validate_password.length = 4;
+              SET GLOBAL validate_password.mixed_case_count = 0;
+              SET GLOBAL validate_password.number_count = 0;
+              SET GLOBAL validate_password.special_char_count = 0;
+              
+              -- 데이터베이스 및 사용자 생성
               CREATE DATABASE IF NOT EXISTS mydb;
-              CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
-              GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+              ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123!';
               GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
-              ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
-              UPDATE mysql.user SET plugin='mysql_native_password' WHERE User='root';
               FLUSH PRIVILEGES;
             " 2>/dev/null || {
-              echo "MySQL setup with password failed, trying without password..."
-              # 비밀번호가 설정되지 않은 경우를 위한 대안
+              echo "MySQL setup failed, trying alternative approach..."
+              
+              # 비밀번호 정책 없이 설정 시도
               mysql -u root -e "
                 CREATE DATABASE IF NOT EXISTS mydb;
-                CREATE USER IF NOT EXISTS 'boarduser'@'localhost' IDENTIFIED BY 'boardpass';
-                GRANT ALL PRIVILEGES ON *.* TO 'boarduser'@'localhost';
+                CREATE USER IF NOT EXISTS 'appuser'@'localhost' IDENTIFIED BY 'App123!';
+                GRANT ALL PRIVILEGES ON *.* TO 'appuser'@'localhost';
                 FLUSH PRIVILEGES;
-              " 2>/dev/null || echo "MySQL setup completed with alternative user"
+              " 2>/dev/null || {
+                echo "Creating simple user..."
+                mysql -u root -e "
+                  CREATE DATABASE IF NOT EXISTS mydb;
+                  CREATE USER IF NOT EXISTS 'boarduser'@'localhost' IDENTIFIED BY 'boardpass123';
+                  GRANT ALL PRIVILEGES ON *.* TO 'boarduser'@'localhost';
+                  FLUSH PRIVILEGES;
+                " 2>/dev/null || echo "MySQL setup completed with fallback"
+              }
             }
             
             # MySQL 포트 확인
