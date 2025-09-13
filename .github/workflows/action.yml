@@ -77,9 +77,23 @@ jobs:
             echo "No JAR file found in artifacts directory"
             exit 1
           fi
+          echo "Checking for DeployServer.sh:"
+          ls -la DeployServer.sh
           echo "Copying DeployServer.sh:"
-          cp DeployServer.sh deploy/
-          chmod +x deploy/DeployServer.sh
+          if [ -f "DeployServer.sh" ]; then
+            cp DeployServer.sh deploy/
+            chmod +x deploy/DeployServer.sh
+            echo "DeployServer.sh copied successfully"
+          else
+            echo "DeployServer.sh not found, creating a simple one"
+            echo '#!/bin/bash' > deploy/DeployServer.sh
+            echo 'echo "Starting Spring Boot application..."' >> deploy/DeployServer.sh
+            echo 'nohup java -jar app.jar > app.log 2>&1 &' >> deploy/DeployServer.sh
+            echo 'echo $! > app.pid' >> deploy/DeployServer.sh
+            echo 'echo "Application started with PID: $(cat app.pid)"' >> deploy/DeployServer.sh
+            chmod +x deploy/DeployServer.sh
+            echo "Created DeployServer.sh"
+          fi
           echo "Deploy directory contents:"
           ls -la deploy/
 
