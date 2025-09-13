@@ -191,7 +191,7 @@ jobs:
             
             # MySQL 포트 확인
             echo "MySQL status:"
-            netstat -tlnp | grep :3306 || echo "MySQL port 3306 not listening"
+            ss -tlnp | grep :3306 || echo "MySQL port 3306 not listening"
             
             # 배포 디렉토리 생성 및 정리
             mkdir -p /root/board-app
@@ -265,7 +265,7 @@ jobs:
             
             # MySQL 상태 확인
             echo "Checking MySQL status..."
-            if netstat -tlnp 2>/dev/null | grep :3306 > /dev/null; then
+            if ss -tlnp 2>/dev/null | grep :3306 > /dev/null; then
               echo " MySQL port 3306 is listening"
             else
               echo " MySQL port 3306 is not listening"
@@ -276,7 +276,7 @@ jobs:
               echo " Application is running"
               
               # 포트 확인
-              if netstat -tlnp 2>/dev/null | grep :8080 > /dev/null; then
+              if ss -tlnp 2>/dev/null | grep :8080 > /dev/null; then
                 echo " Port 8080 is listening"
               else
                 echo " Port 8080 is not listening"
