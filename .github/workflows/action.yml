@@ -78,7 +78,11 @@ jobs:
             exit 1
           fi
           echo "Checking for DeployServer.sh:"
-          ls -la DeployServer.sh
+          if [ -f "DeployServer.sh" ]; then
+            ls -la DeployServer.sh
+          else
+            echo "DeployServer.sh not found in current directory"
+          fi
           echo "Copying DeployServer.sh:"
           if [ -f "DeployServer.sh" ]; then
             cp DeployServer.sh deploy/
