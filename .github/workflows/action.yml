@@ -119,7 +119,6 @@ jobs:
           target: "/root/board-app/"
           strip_components: 1
           debug: true
-          overwrite: true
 
       - name: Extract and Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
@@ -242,23 +241,12 @@ jobs:
             ls -la ~/board-app/
             
             # JAR 파일이 있는지 확인 후 애플리케이션 실행
-            echo "Waiting for JAR file..."
-            for i in {1..30}; do
-              if [ -f "app.jar" ]; then
-                echo "JAR file found! Starting application..."
-                ./DeployServer.sh
-                break
-              else
-                echo "Waiting for app.jar... ($i/30)"
-                sleep 2
-              fi
-            done
-            
-            if [ ! -f "app.jar" ]; then
-              echo "ERROR: app.jar still not found after waiting!"
-              echo "Checking all files in directory:"
-              find . -name "*.jar" -type f
-              echo "SCP might have failed. Check previous steps."
+            if [ -f "app.jar" ]; then
+              echo "Starting application..."
+              ./DeployServer.sh
+            else
+              echo "ERROR: app.jar not found!"
+              echo "This deployment method needs SCP to work properly."
               exit 1
             fi
             
