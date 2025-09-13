@@ -27,10 +27,8 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
-      - name: Clean and Build with Gradle Wrapper
-        run: |
-          ./gradlew clean
-          ./gradlew build --no-daemon --refresh-dependencies
+      - name: Build with Gradle Wrapper
+        run: ./gradlew build
 
       - name: Run tests
         run: ./gradlew test
@@ -155,39 +153,13 @@ jobs:
             # MySQL 재시작
             systemctl restart mysql || service mysql restart
             
-            # MySQL 비밀번호 정책 완화 및 초기 설정
+            # MySQL 외부 접속 사용자 생성
             mysql -u root -e "
-              -- 비밀번호 정책 완화
-              SET GLOBAL validate_password.policy = LOW;
-              SET GLOBAL validate_password.length = 4;
-              SET GLOBAL validate_password.mixed_case_count = 0;
-              SET GLOBAL validate_password.number_count = 0;
-              SET GLOBAL validate_password.special_char_count = 0;
-              
-              -- 데이터베이스 및 사용자 생성
               CREATE DATABASE IF NOT EXISTS mydb;
-              ALTER USER 'root'@'localhost' IDENTIFIED BY 'root123!';
-              GRANT ALL PRIVILEGES ON *.* TO 'root'@'localhost' WITH GRANT OPTION;
+              CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'root';
+              GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
               FLUSH PRIVILEGES;
-            " 2>/dev/null || {
-              echo "MySQL setup failed, trying alternative approach..."
-              
-              # 비밀번호 정책 없이 설정 시도
-              mysql -u root -e "
-                CREATE DATABASE IF NOT EXISTS mydb;
-                CREATE USER IF NOT EXISTS 'appuser'@'localhost' IDENTIFIED BY 'App123!';
-                GRANT ALL PRIVILEGES ON *.* TO 'appuser'@'localhost';
-                FLUSH PRIVILEGES;
-              " 2>/dev/null || {
-                echo "Creating simple user..."
-                mysql -u root -e "
-                  CREATE DATABASE IF NOT EXISTS mydb;
-                  CREATE USER IF NOT EXISTS 'boarduser'@'localhost' IDENTIFIED BY 'boardpass123';
-                  GRANT ALL PRIVILEGES ON *.* TO 'boarduser'@'localhost';
-                  FLUSH PRIVILEGES;
-                " 2>/dev/null || echo "MySQL setup completed with fallback"
-              }
-            }
+            " 2>/dev/null || echo "MySQL user setup completed"
             
             # MySQL 포트 확인
             echo "MySQL status:"
@@ -197,7 +169,7 @@ jobs:
             mkdir -p /root/board-app
             cd /root/board-app
             
-            # 기존 애플리케이션 종료 및 캐시 정리
+            # 기존 애플리케이션 종료
             if [ -f app.pid ]; then
               PID=$(cat app.pid)
               if ps -p $PID > /dev/null 2>&1; then
@@ -210,20 +182,6 @@ jobs:
               fi
               rm -f app.pid
             fi
-            
-            # 모든 Java 프로세스 종료 (안전장치)
-            pkill -f "java.*app.jar" || echo "No Java processes found"
-            
-            # 기존 JAR 파일 및 로그 정리
-            rm -f app.jar
-            rm -f app.log
-            rm -f *.log
-            
-            # 임시 파일 정리
-            rm -rf /tmp/spring-boot-*
-            rm -rf /tmp/tomcat*
-            
-            echo "Cache and old files cleaned up"
             
             # 간단한 배포 스크립트 생성
             cat > DeployServer.sh << 'EOF'
