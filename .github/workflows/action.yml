@@ -106,20 +106,17 @@ jobs:
           cd deploy
           tar -czf ../deployment.tar.gz .
 
-      - name: Create simple deployment script
-        run: |
-          echo "Creating deployment script..."
-          cat > simple_deploy.sh << 'EOF'
-          #!/bin/bash
-          echo "Starting Spring Boot application..."
-          nohup java -jar app.jar > app.log 2>&1 &
-          PID=$!
-          echo $PID > app.pid
-          echo "Application started with PID: $PID"
-          EOF
-          
-          echo "Script created successfully"
-          ls -la simple_deploy.sh
+      - name: Deploy JAR to Server
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: 211.209.1.229
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: 2000
+          source: "deploy/*"
+          target: "/home/${{ secrets.SERVER_USER }}/board-app/"
+          strip_components: 1
+          debug: true
 
       - name: Extract and Deploy on Server
         uses: appleboy/ssh-action@v1.0.3
