@@ -223,7 +223,7 @@ jobs:
             
             # MySQL 상태 확인
             echo "Checking MySQL status..."
-            if ss -tlnp 2>/dev/null | grep :3306 > /dev/null; then
+            if ss -tlnp 2>/dev/nulqpp[[]wooppp[wwl | grep :3306 > /dev/null; then
               echo " MySQL port 3306 is listening"
             else
               echo " MySQL port 3306 is not listening"
