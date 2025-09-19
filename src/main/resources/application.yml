@@ -12,21 +12,21 @@ springdoc:
 
 ---
 
-# spring:
-#   config:
-#     activate:
-#       on-profile: ty
+spring:
+  config:
+    activate:
+      on-profile: ty
 
-#   datasource:
-#     url: jdbc:mysql://localhost:3306/mydb?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-#     driver-class-name: com.mysql.cj.jdbc.Driver
-#     username: root
-#     password: root
+  datasource:
+    url: jdbc:mysql://localhost:3306/board_db?useSSL=false&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: root
 
-#   jpa:
-#     hibernate:
-#       ddl-auto: update
-#     open-in-view: true
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
 
 # logging:
 #   level:
@@ -51,7 +51,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     open-in-view: true
     show-sql: true
     properties:
@@ -69,3 +69,5 @@ logging:
       max-history: 30
   level:
     root: info
+    com.zaxxer.hikari: debug
+    org.springframework.jdbc: debug
