@@ -40,7 +40,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: board-application
-          path: build/libs/*.jar
+          path: build/libs/*[!plain].jar  # plain.jar 제외
 
       - name: Build info
         run: |
@@ -69,7 +69,7 @@ jobs:
           echo "Finding JAR files:"
           find ./artifacts -name "*.jar" -type f
           echo "Copying JAR file:"
-          JAR_FILE=$(find ./artifacts -name "*.jar" -type f | head -1)
+          JAR_FILE=$(find ./artifacts -name "*.jar" -not -name "*plain.jar" -type f | head -1)
           if [ -n "$JAR_FILE" ]; then
             cp "$JAR_FILE" deploy/app.jar
             echo "JAR file copied successfully"
