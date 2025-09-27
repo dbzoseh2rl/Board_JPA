@@ -250,6 +250,3 @@ jobs:
               tail -n 20 ~/board-app/app.log || echo "No log file found"
               exit 1
             fi
-
-
-
